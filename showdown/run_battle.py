@@ -118,8 +118,9 @@ async def _initialize_battle_with_tag(ps_websocket_client: PSWebsocketClient):
                 stats["spe"] = pokemon_dict["stats"]["spe"]
 
                 # Get moves
+                num_moves = len(pokemon_dict["moves"])# not always 4!
                 moves = []
-                for j in range(4):
+                for j in range(num_moves):
                     mname = pokemon_dict["moves"][j]
                     move = Move(mname,-1,True,"unknown",-1,-1,"unknown")
                     moves.append(move)
@@ -127,8 +128,8 @@ async def _initialize_battle_with_tag(ps_websocket_client: PSWebsocketClient):
                 active = pokemon_dict["active"]
                 status = "none"
                 
-                print("name = " + name)
-                print("level = " + str(level))
+                print("name = [" + name + "]")
+                print("level = [" + str(level) + "]")
 
                 pokemon = Pokemon(name, i, [], level, max_health, stats, moves, status, active)
                 pokemons.append(pokemons)
