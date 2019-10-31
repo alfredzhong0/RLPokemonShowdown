@@ -127,12 +127,18 @@ async def _initialize_battle_with_tag(ps_websocket_client: PSWebsocketClient):
 
                 active = pokemon_dict["active"]
                 status = "none"
-                
-                print("name = [" + name + "]")
-                print("level = [" + str(level) + "]")
 
                 pokemon = Pokemon(name, i, [], level, max_health, stats, moves, status, active)
-                pokemons.append(pokemons)
+                pokemons.append(pokemon)
+
+            for i in range(len(pokemons)):
+                pokemon = pokemons[i]
+                print(pokemon)
+                # print("~~~~~~~~%i~~~~~~~~~" % (i))
+                # print("Name = %s" % (pokemon.name))
+                # print("Lvl = %s" % (pokemon.level))
+                # for j in range(len(pokemon.moves)):
+                #     print(pokemon.moves[j])
 
             # Populate enemy lineup (empty template until more information is reveal)
             enemy_pokemons = []
