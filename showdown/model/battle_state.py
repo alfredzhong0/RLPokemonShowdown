@@ -50,3 +50,12 @@ class RLBattle:
         self.opponent_lineup = opponent_lineup
 
 
+        # Helper vars
+        self.force_switch = False # must switch to unfainted pokemon
+        self.available_moves = [] # available moves that the AI can pick
+        self.available_switches = []
+
+
+
+
+

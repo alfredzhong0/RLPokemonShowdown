@@ -18,6 +18,7 @@ from showdown.websocket_client import PSWebsocketClient
 
 
 import sys
+import random
 from showdown.model.battle_state import Move, Pokemon, RLBattle
 
 
@@ -94,7 +95,7 @@ async def _initialize_battle_with_tag(ps_websocket_client: PSWebsocketClient):
 
                 # Get name of pokemon
                 string = pokemon_dict["ident"]
-                token = "p1: "
+                token = "p1: " # FIX ME!!! might also be p2:
                 name = string[string.find(token) + len(token) + 1:]
 
                 # Get level of pokemon
@@ -154,13 +155,9 @@ async def _initialize_battle_with_tag(ps_websocket_client: PSWebsocketClient):
             battle = RLBattle(pokemons, enemy_pokemons)
             battle.battle_tag = battle_tag
             battle.opponent_name = opponent_name
-
-            # print("done...")
-
-            # sys.exit(1)
+            parse_message(battle, msg)
 
             return battle
-            # return battle, opponent_id, user_json
 
 
 async def _start_random_battle(ps_websocket_client: PSWebsocketClient):
@@ -198,8 +195,52 @@ async def format_decision(battle, decision):
     return [message, str(battle.rqid)]
 
 
-# Check if we need user input
-async def require_user_input(msg):
+def parse_message(battle, msg):
+
+    print("parse_message")
+    if ('|request|' in msg):
+
+        # Reset possible moves
+        battle.wait = False
+        battle.force_switch = False
+        battle.available_moves = []
+        battle.available_switches = []
+
+        split_msg = msg.split('|')
+        user_json = json.loads(split_msg[2].strip('\''))
+
+        if (("wait" in user_json) and user_json["wait"]): # i.e. when pokemon faints
+            battle.wait = True
+        elif (("forceSwitch" in user_json) and user_json["forceSwitch"]): # i.e. when pokemon faints
+            battle.force_switch = True
+        else:
+            available_moves = user_json["active"][0]["moves"]
+            trapped = "trapped" in user_json["active"][0] # special case where only 'recharge' is allowed
+            
+            if (trapped):
+                battle.available_moves.append("recharge")
+            else:
+                for i in range(len(available_moves)):
+                    move = available_moves[i]
+                    if (move["disabled"] == False):
+                        battle.available_moves.append(move["id"])
+                    print("available move: " + move["id"])
+
+        pokemons = user_json["side"]["pokemon"]
+        for i in range(6):
+            pokemon = pokemons[i]
+            if ("fnt" not in pokemon["condition"]): # can only switch to unfainted pokemon
+                
+                string = pokemon["details"]
+                token = ", L"
+                #level = int(string[string.find(token) + len(token):])
+                name = string[:string.find(token)]
+                battle.available_switches.append(name)
+                print("available switch: " + name)
+
+
+# Check if we need AI to make a move
+def require_ai_action(msg):
     msg_lines = msg.split('\n')
     action = None
     for line in msg_lines:
@@ -207,7 +248,7 @@ async def require_user_input(msg):
         if len(split_msg) < 2:
             continue
         action = split_msg[1].strip()
-        if action in ['turn', 'upkeep']:
+        if action in ['turn', 'upkeep', 'faint']:
             return True
 
     if action == 'inactive':
@@ -216,20 +257,34 @@ async def require_user_input(msg):
     # if action != "request":
     #     return battle.force_switch
 
+async def ai_move(ps_websocket_client,battle):
+    ai_action = ""
+    if (battle.force_switch or len(battle.available_moves) == 0):
+        switch_to = random.choice(battle.available_switches)
+        ai_action = "/switch " + str(switch_to)
+    else:
+        #print("available_moves = " + str(battle.available_moves))
+        move = random.choice(battle.available_moves)
+        ai_action = "/choose move " + move
+    await ps_websocket_client.send_message(battle.battle_tag,[ai_action])
+    # user_input = input("requesting action...")
+    # print("Processing user_input = " + user_input)
+    # await ps_websocket_client.send_message(battle.battle_tag,[user_input])
+
 async def pokemon_battle(ps_websocket_client: PSWebsocketClient, pokemon_battle_type):
 
     # This is always the case for now - may want to extend in the future
-    if "random" in pokemon_battle_type:
-        Scoring.POKEMON_ALIVE_STATIC = 30  # random battle benefits from a lower static score for an alive pkmn
-        battle = await _start_random_battle(ps_websocket_client)
+    #if "random" in pokemon_battle_type:
+    battle = await _start_random_battle(ps_websocket_client)
+    await ai_move(ps_websocket_client,battle) # first move outside loop because of server implementation
 
     # Turn on timer so opponent can't be a dick
     # await ps_websocket_client.send_message(battle.battle_tag,['/timer on'])
 
-    print("requesting action...")
-    user_input = input("requesting action...")
-    print("Processing user_input = " + user_input)
-    await ps_websocket_client.send_message(battle.battle_tag,[user_input])
+    # user_input = input("requesting action...")
+    # print("Processing user_input = " + user_input)
+    # await ps_websocket_client.send_message(battle.battle_tag,[user_input])
+
 
     # Main game loop
     while True:
@@ -242,8 +297,9 @@ async def pokemon_battle(ps_websocket_client: PSWebsocketClient, pokemon_battle_
             # await ps_websocket_client.send_message(battle.battle_tag, [config.battle_ending_message])
             # await ps_websocket_client.leave_battle(battle.battle_tag, save_replay=config.save_replay)
             return winner
-        action_required = await require_user_input(msg)
+
+        parse_message(battle, msg)
+        action_required = require_ai_action(msg)
         if action_required:
-            user_input = input("requesting action...")
-            print("Processing user_input = " + user_input)
-            await ps_websocket_client.send_message(battle.battle_tag,[user_input])
+            await ai_move(ps_websocket_client,battle)
+
