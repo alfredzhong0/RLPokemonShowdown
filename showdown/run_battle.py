@@ -215,9 +215,12 @@ def parse_message(battle, msg):
             battle.force_switch = True
         else:
             available_moves = user_json["active"][0]["moves"]
-            trapped = "trapped" in user_json["active"][0] # special case where only 'recharge' is allowed
+            trapped = "trapped" in user_json["active"][0] # special case where only one move is allowed
             
             if (trapped):
+                move = available_moves[0] # only one move available to use
+                battle.available_moves.append(move["id"])
+            elif (available_moves[0]["id"] == "recharge"): # previous case should handle this, but sometimes server doesn't output "trapped" key
                 battle.available_moves.append("recharge")
             else:
                 for i in range(len(available_moves)):
