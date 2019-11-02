@@ -41,6 +41,11 @@ class Pokemon:
 
 class RLBattle:
     def __init__(self, player_lineup, opponent_lineup):
+        # self.P1 = "" # Player 1 
+        # self.P2 = "" # Player 2
+        # self.isP1 = False # Is the bot P1?
+        self.battle_tag = "" # Need this to send messages to server (???)
+        self.opponent_name = ""
         self.player_lineup = player_lineup
         self.opponent_lineup = opponent_lineup
 
