@@ -1,0 +1,43 @@
+{
+    "compilerOptions": {
+        "lib": ["es2015", "es2016.array.include", "es2017.object"],
+        "noEmit": true,
+        "target": "esnext",
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "strict": true,
+        "allowJs": true,
+        "checkJs": true
+    },
+    "types": ["node"],
+    "exclude": [
+        "./.*-dist/**/*",
+        "./server/index.js",
+        "./server/chat-commands.js"
+    ],
+    "include": [
+        "./config/formats.js",
+        "./data/*",
+        "./data/mods/*/*",
+        "./dev-tools/*.ts",
+        "./lib/*",
+        "./server/*",
+        "./server/tournaments/*",
+        "./server/chat-plugins/*.ts",
+        "./server/chat-plugins/chat-monitor.js",
+        "./server/chat-plugins/daily-spotlight.js",
+        "./server/chat-plugins/hangman.js",
+        "./server/chat-plugins/helptickets.js",
+        "./server/chat-plugins/mafia-data.js",
+        "./server/chat-plugins/mafia.js",
+        "./server/chat-plugins/othermetas.js",
+        "./server/chat-plugins/poll.js",
+        "./server/chat-plugins/room-faqs.js",
+        "./server/chat-plugins/thecafe.js",
+        "./server/chat-plugins/thing-of-the-day.js",
+        "./server/chat-plugins/uno.js",
+        "./server/chat-plugins/wifi.js",
+        "./sim/**/*",
+        "./tools/set-import/*.ts"
+    ]
+}

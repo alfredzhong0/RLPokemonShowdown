@@ -1,0 +1,276 @@
+
+Error: ENOENT: no such file or directory, chmod '/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/logs/repl/sim-19600'
+    at Object.chmodSync (fs.js:1104:3)
+    at Server.<anonymous> (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.lib-dist/repl.js:96:7)
+    at Object.onceWrapper (events.js:299:28)
+    at Server.emit (events.js:210:5)
+    at Server.EventEmitter.emit (domain.js:476:20)
+    at emitListeningNT (net.js:1334:10)
+    at processTicksAndRejections (internal/process/task_queues.js:79:21)
+
+Error [ERR_IPC_DISCONNECTED]: IPC channel is already disconnected
+    at ChildProcess.target.disconnect (internal/child_process.js:832:26)
+    at QueryProcessWrapper.destroy (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.lib-dist/process-manager.js:111:16)
+    at ChildProcess.<anonymous> (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.lib-dist/process-manager.js:77:9)
+    at ChildProcess.emit (events.js:210:5)
+    at ChildProcess.EventEmitter.emit (domain.js:476:20)
+    at finish (internal/child_process.js:861:14)
+    at processTicksAndRejections (internal/process/task_queues.js:75:11)
+
+Error: ENOENT: no such file or directory, chmod '/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/logs/repl/modlog'
+    at Object.chmodSync (fs.js:1104:3)
+    at Server.<anonymous> (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.lib-dist/repl.js:96:7)
+    at Object.onceWrapper (events.js:299:28)
+    at Server.emit (events.js:210:5)
+    at Server.EventEmitter.emit (domain.js:476:20)
+    at emitListeningNT (net.js:1334:10)
+    at processTicksAndRejections (internal/process/task_queues.js:79:21)
+
+Error: ENOENT: no such file or directory, chmod '/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/logs/repl/dexsearch'
+    at Object.chmodSync (fs.js:1104:3)
+    at Server.<anonymous> (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.lib-dist/repl.js:96:7)
+    at Object.onceWrapper (events.js:299:28)
+    at Server.emit (events.js:210:5)
+    at Server.EventEmitter.emit (domain.js:476:20)
+    at emitListeningNT (net.js:1334:10)
+    at processTicksAndRejections (internal/process/task_queues.js:79:21)
+
+Error: ENOENT: no such file or directory, chmod '/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/logs/repl/team-validator-19605'
+    at Object.chmodSync (fs.js:1104:3)
+    at Server.<anonymous> (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.lib-dist/repl.js:96:7)
+    at Object.onceWrapper (events.js:299:28)
+    at Server.emit (events.js:210:5)
+    at Server.EventEmitter.emit (domain.js:476:20)
+    at emitListeningNT (net.js:1334:10)
+    at processTicksAndRejections (internal/process/task_queues.js:79:21)
+
+Error [ERR_IPC_CHANNEL_CLOSED]: Channel closed
+    at ChildProcess.target.send (internal/child_process.js:678:16)
+    at QueryProcessWrapper.query (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.lib-dist/process-manager.js:88:16)
+    at QueryProcessManager.query (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.lib-dist/process-manager.js:319:18)
+    at Object.verify (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.server-dist/verifier.js:30:20)
+    at User.rename (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.server-dist/users.js:857:34)
+    at CommandContext.trn (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/server/chat-commands.js:4693:8)
+    at CommandContext.run (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.server-dist/chat.js:503:28)
+    at CommandContext.parse (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.server-dist/chat.js:335:19)
+    at _class.parse (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.server-dist/chat.js:1350:18)
+    at User.processChatQueue (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.server-dist/users.js:1519:9)
+
+Error [ERR_IPC_CHANNEL_CLOSED]: Channel closed
+    at ChildProcess.target.send (internal/child_process.js:678:16)
+    at QueryProcessWrapper.query (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.lib-dist/process-manager.js:88:16)
+    at QueryProcessManager.query (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.lib-dist/process-manager.js:319:18)
+    at Object.verify (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.server-dist/verifier.js:30:20)
+    at User.rename (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.server-dist/users.js:857:34)
+    at CommandContext.trn (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/server/chat-commands.js:4693:8)
+    at CommandContext.run (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.server-dist/chat.js:503:28)
+    at CommandContext.parse (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.server-dist/chat.js:335:19)
+    at _class.parse (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.server-dist/chat.js:1350:18)
+    at User.chat (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.server-dist/users.js:1477:9)
+
+Error [ERR_IPC_DISCONNECTED]: IPC channel is already disconnected
+    at ChildProcess.target.disconnect (internal/child_process.js:832:26)
+    at QueryProcessWrapper.destroy (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.lib-dist/process-manager.js:111:16)
+    at ChildProcess.<anonymous> (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.lib-dist/process-manager.js:77:9)
+    at ChildProcess.emit (events.js:210:5)
+    at ChildProcess.EventEmitter.emit (domain.js:476:20)
+    at finish (internal/child_process.js:861:14)
+    at processTicksAndRejections (internal/process/task_queues.js:75:11)
+
+Error: ENOENT: no such file or directory, chmod '/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/logs/repl/sim-19620'
+    at Object.chmodSync (fs.js:1104:3)
+    at Server.<anonymous> (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.lib-dist/repl.js:96:7)
+    at Object.onceWrapper (events.js:299:28)
+    at Server.emit (events.js:210:5)
+    at Server.EventEmitter.emit (domain.js:476:20)
+    at emitListeningNT (net.js:1334:10)
+    at processTicksAndRejections (internal/process/task_queues.js:79:21)
+
+Error: ENOENT: no such file or directory, chmod '/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/logs/repl/modlog'
+    at Object.chmodSync (fs.js:1104:3)
+    at Server.<anonymous> (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.lib-dist/repl.js:96:7)
+    at Object.onceWrapper (events.js:299:28)
+    at Server.emit (events.js:210:5)
+    at Server.EventEmitter.emit (domain.js:476:20)
+    at emitListeningNT (net.js:1334:10)
+    at processTicksAndRejections (internal/process/task_queues.js:79:21)
+
+Error: ENOENT: no such file or directory, chmod '/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/logs/repl/dexsearch'
+    at Object.chmodSync (fs.js:1104:3)
+    at Server.<anonymous> (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.lib-dist/repl.js:96:7)
+    at Object.onceWrapper (events.js:299:28)
+    at Server.emit (events.js:210:5)
+    at Server.EventEmitter.emit (domain.js:476:20)
+    at emitListeningNT (net.js:1334:10)
+    at processTicksAndRejections (internal/process/task_queues.js:79:21)
+
+Error: ENOENT: no such file or directory, chmod '/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/logs/repl/team-validator-19625'
+    at Object.chmodSync (fs.js:1104:3)
+    at Server.<anonymous> (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.lib-dist/repl.js:96:7)
+    at Object.onceWrapper (events.js:299:28)
+    at Server.emit (events.js:210:5)
+    at Server.EventEmitter.emit (domain.js:476:20)
+    at emitListeningNT (net.js:1334:10)
+    at processTicksAndRejections (internal/process/task_queues.js:79:21)
+
+Error [ERR_IPC_CHANNEL_CLOSED]: Channel closed
+    at ChildProcess.target.send (internal/child_process.js:678:16)
+    at QueryProcessWrapper.query (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.lib-dist/process-manager.js:88:16)
+    at QueryProcessManager.query (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.lib-dist/process-manager.js:319:18)
+    at Object.verify (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.server-dist/verifier.js:30:20)
+    at User.rename (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.server-dist/users.js:857:34)
+    at CommandContext.trn (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/server/chat-commands.js:4693:8)
+    at CommandContext.run (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.server-dist/chat.js:503:28)
+    at CommandContext.parse (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.server-dist/chat.js:335:19)
+    at _class.parse (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.server-dist/chat.js:1350:18)
+    at User.processChatQueue (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.server-dist/users.js:1519:9)
+
+Error [ERR_IPC_CHANNEL_CLOSED]: Channel closed
+    at ChildProcess.target.send (internal/child_process.js:678:16)
+    at QueryProcessWrapper.query (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.lib-dist/process-manager.js:88:16)
+    at QueryProcessManager.query (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.lib-dist/process-manager.js:319:18)
+    at Object.verify (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.server-dist/verifier.js:30:20)
+    at User.rename (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.server-dist/users.js:857:34)
+    at CommandContext.trn (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/server/chat-commands.js:4693:8)
+    at CommandContext.run (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.server-dist/chat.js:503:28)
+    at CommandContext.parse (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.server-dist/chat.js:335:19)
+    at _class.parse (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.server-dist/chat.js:1350:18)
+    at User.chat (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.server-dist/users.js:1477:9)
+
+Error [ERR_IPC_CHANNEL_CLOSED]: Channel closed
+    at ChildProcess.target.send (internal/child_process.js:678:16)
+    at QueryProcessWrapper.query (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.lib-dist/process-manager.js:88:16)
+    at QueryProcessManager.query (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.lib-dist/process-manager.js:319:18)
+    at Object.verify (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.server-dist/verifier.js:30:20)
+    at User.rename (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.server-dist/users.js:857:34)
+    at CommandContext.trn (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/server/chat-commands.js:4693:8)
+    at CommandContext.run (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.server-dist/chat.js:503:28)
+    at CommandContext.parse (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.server-dist/chat.js:335:19)
+    at _class.parse (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.server-dist/chat.js:1350:18)
+    at User.chat (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.server-dist/users.js:1477:9)
+
+Error [ERR_IPC_CHANNEL_CLOSED]: Channel closed
+    at ChildProcess.target.send (internal/child_process.js:678:16)
+    at QueryProcessWrapper.query (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.lib-dist/process-manager.js:88:16)
+    at QueryProcessManager.query (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.lib-dist/process-manager.js:319:18)
+    at Object.verify (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.server-dist/verifier.js:30:20)
+    at User.rename (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.server-dist/users.js:857:34)
+    at CommandContext.trn (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/server/chat-commands.js:4693:8)
+    at CommandContext.run (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.server-dist/chat.js:503:28)
+    at CommandContext.parse (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.server-dist/chat.js:335:19)
+    at _class.parse (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.server-dist/chat.js:1350:18)
+    at User.chat (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.server-dist/users.js:1477:9)
+
+Error [ERR_IPC_CHANNEL_CLOSED]: Channel closed
+    at ChildProcess.target.send (internal/child_process.js:678:16)
+    at QueryProcessWrapper.query (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.lib-dist/process-manager.js:88:16)
+    at QueryProcessManager.query (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.lib-dist/process-manager.js:319:18)
+    at Object.verify (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.server-dist/verifier.js:30:20)
+    at User.rename (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.server-dist/users.js:857:34)
+    at CommandContext.trn (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/server/chat-commands.js:4693:8)
+    at CommandContext.run (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.server-dist/chat.js:503:28)
+    at CommandContext.parse (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.server-dist/chat.js:335:19)
+    at _class.parse (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.server-dist/chat.js:1350:18)
+    at User.chat (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.server-dist/users.js:1477:9)
+
+Error [ERR_IPC_DISCONNECTED]: IPC channel is already disconnected
+    at ChildProcess.target.disconnect (internal/child_process.js:832:26)
+    at QueryProcessWrapper.destroy (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.lib-dist/process-manager.js:111:16)
+    at ChildProcess.<anonymous> (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.lib-dist/process-manager.js:77:9)
+    at ChildProcess.emit (events.js:210:5)
+    at ChildProcess.EventEmitter.emit (domain.js:476:20)
+    at finish (internal/child_process.js:861:14)
+    at processTicksAndRejections (internal/process/task_queues.js:75:11)
+
+Error: ENOENT: no such file or directory, chmod '/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/logs/repl/modlog'
+    at Object.chmodSync (fs.js:1104:3)
+    at Server.<anonymous> (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.lib-dist/repl.js:96:7)
+    at Object.onceWrapper (events.js:299:28)
+    at Server.emit (events.js:210:5)
+    at Server.EventEmitter.emit (domain.js:476:20)
+    at emitListeningNT (net.js:1334:10)
+    at processTicksAndRejections (internal/process/task_queues.js:79:21)
+
+Error: ENOENT: no such file or directory, chmod '/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/logs/repl/sim-19637'
+    at Object.chmodSync (fs.js:1104:3)
+    at Server.<anonymous> (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.lib-dist/repl.js:96:7)
+    at Object.onceWrapper (events.js:299:28)
+    at Server.emit (events.js:210:5)
+    at Server.EventEmitter.emit (domain.js:476:20)
+    at emitListeningNT (net.js:1334:10)
+    at processTicksAndRejections (internal/process/task_queues.js:79:21)
+
+Error: ENOENT: no such file or directory, chmod '/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/logs/repl/dexsearch'
+    at Object.chmodSync (fs.js:1104:3)
+    at Server.<anonymous> (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.lib-dist/repl.js:96:7)
+    at Object.onceWrapper (events.js:299:28)
+    at Server.emit (events.js:210:5)
+    at Server.EventEmitter.emit (domain.js:476:20)
+    at emitListeningNT (net.js:1334:10)
+    at processTicksAndRejections (internal/process/task_queues.js:79:21)
+
+Error: ENOENT: no such file or directory, chmod '/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/logs/repl/team-validator-19642'
+    at Object.chmodSync (fs.js:1104:3)
+    at Server.<anonymous> (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.lib-dist/repl.js:96:7)
+    at Object.onceWrapper (events.js:299:28)
+    at Server.emit (events.js:210:5)
+    at Server.EventEmitter.emit (domain.js:476:20)
+    at emitListeningNT (net.js:1334:10)
+    at processTicksAndRejections (internal/process/task_queues.js:79:21)
+
+Error [ERR_IPC_CHANNEL_CLOSED]: Channel closed
+    at ChildProcess.target.send (internal/child_process.js:678:16)
+    at QueryProcessWrapper.query (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.lib-dist/process-manager.js:88:16)
+    at QueryProcessManager.query (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.lib-dist/process-manager.js:319:18)
+    at Object.verify (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.server-dist/verifier.js:30:20)
+    at User.rename (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.server-dist/users.js:857:34)
+    at CommandContext.trn (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/server/chat-commands.js:4693:8)
+    at CommandContext.run (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.server-dist/chat.js:503:28)
+    at CommandContext.parse (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.server-dist/chat.js:335:19)
+    at _class.parse (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.server-dist/chat.js:1350:18)
+    at User.processChatQueue (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.server-dist/users.js:1519:9)
+
+Error [ERR_IPC_DISCONNECTED]: IPC channel is already disconnected
+    at ChildProcess.target.disconnect (internal/child_process.js:832:26)
+    at QueryProcessWrapper.destroy (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.lib-dist/process-manager.js:111:16)
+    at ChildProcess.<anonymous> (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.lib-dist/process-manager.js:77:9)
+    at ChildProcess.emit (events.js:210:5)
+    at ChildProcess.EventEmitter.emit (domain.js:476:20)
+    at finish (internal/child_process.js:861:14)
+    at processTicksAndRejections (internal/process/task_queues.js:75:11)
+
+Error: ENOENT: no such file or directory, chmod '/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/logs/repl/modlog'
+    at Object.chmodSync (fs.js:1104:3)
+    at Server.<anonymous> (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.lib-dist/repl.js:96:7)
+    at Object.onceWrapper (events.js:299:28)
+    at Server.emit (events.js:210:5)
+    at Server.EventEmitter.emit (domain.js:476:20)
+    at emitListeningNT (net.js:1334:10)
+    at processTicksAndRejections (internal/process/task_queues.js:79:21)
+
+Error: ENOENT: no such file or directory, chmod '/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/logs/repl/sim-19660'
+    at Object.chmodSync (fs.js:1104:3)
+    at Server.<anonymous> (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.lib-dist/repl.js:96:7)
+    at Object.onceWrapper (events.js:299:28)
+    at Server.emit (events.js:210:5)
+    at Server.EventEmitter.emit (domain.js:476:20)
+    at emitListeningNT (net.js:1334:10)
+    at processTicksAndRejections (internal/process/task_queues.js:79:21)
+
+Error: ENOENT: no such file or directory, chmod '/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/logs/repl/dexsearch'
+    at Object.chmodSync (fs.js:1104:3)
+    at Server.<anonymous> (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.lib-dist/repl.js:96:7)
+    at Object.onceWrapper (events.js:299:28)
+    at Server.emit (events.js:210:5)
+    at Server.EventEmitter.emit (domain.js:476:20)
+    at emitListeningNT (net.js:1334:10)
+    at processTicksAndRejections (internal/process/task_queues.js:79:21)
+
+Error: ENOENT: no such file or directory, chmod '/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/logs/repl/team-validator-19665'
+    at Object.chmodSync (fs.js:1104:3)
+    at Server.<anonymous> (/Users/alfred/Desktop/UT_Fall_2019/Reinforcement_Learning/final_project/Pokemon-Showdown/.lib-dist/repl.js:96:7)
+    at Object.onceWrapper (events.js:299:28)
+    at Server.emit (events.js:210:5)
+    at Server.EventEmitter.emit (domain.js:476:20)
+    at emitListeningNT (net.js:1334:10)
+    at processTicksAndRejections (internal/process/task_queues.js:79:21)
