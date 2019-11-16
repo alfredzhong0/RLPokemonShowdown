@@ -46,6 +46,14 @@ stream = new Sim.BattleStream();
     setTimeout(function () {
     stream.write(`>p1 move 1`);
 	stream.write(`>p2 move 1`);
+    stream.write(`>p1 move 1`);
+    stream.write(`>p2 move 1`);
+    stream.write(`>p1 move 1`);
+    stream.write(`>p2 move 1`);
+    stream.write(`>p1 move 1`);
+    stream.write(`>p2 move 1`);
+    stream.write(`>p1 move 1`);
+    stream.write(`>p2 move 1`);
     }, 1000)
  //    stream.write(`>p1 move 3`);
 	// stream.write(`>p2 move 1`);

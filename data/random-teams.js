@@ -33,9 +33,6 @@ class RandomTeams {
 	 * @param {?PRNG | [number, number, number, number]} [prng]
 	 */
 	constructor(format, prng) {
-
-		console.log("creating random teams")
-
 		format = Dex.getFormat(format);
 		this.dex = Dex.forFormat(format);
 		this.gen = this.dex.gen;

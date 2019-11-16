@@ -2968,8 +2968,8 @@ var _state = require('./state');
 
 	getTeam(options) {
 		let team = options.team;
-		console.log("\n\noptions:")
-		console.log(options)
+		// console.log("\n\noptions:")
+		// console.log(options)
 		//exit()
 
 
