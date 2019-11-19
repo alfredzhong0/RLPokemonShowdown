@@ -37,7 +37,7 @@ def reset_server():
     return asyncio.get_event_loop().run_until_complete(reset_wrapper())
 
 
-async def testAlfred():
+async def test_random_policy():
     async with websockets.connect(uri) as websocket:
 
         await websocket.send("new_game")
@@ -109,7 +109,31 @@ async def testAlfred():
             print("action = " + action)
             await websocket.send(action)
 
+async def test_user_input():
+    async with websockets.connect(uri) as websocket:
 
-asyncio.get_event_loop().run_until_complete(testAlfred())
+        await websocket.send("new_game")
+        while (True):
+            state_msg = await websocket.recv()
+
+
+            #print("\nReceived state: " + state_msg)
+            state = json.loads(state_msg)
+
+            if (state["winner"] != "empty"):
+                print("Winner = " + state["winner"])
+                print("Replay log = \n" + state["replay"])
+                break
+
+            p1move = input("Player 1 action:")
+            p2move = input("Player 2 action:")
+
+            action = json.dumps({"p1":p1move, "p2":p2move})
+            print("action = " + action)
+            await websocket.send(action)
+
+
+#asyncio.get_event_loop().run_until_complete(test_user_input())
+asyncio.get_event_loop().run_until_complete(test_random_policy())
 
 #asyncio.run(hello())
