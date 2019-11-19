@@ -50,6 +50,7 @@ async def testAlfred():
 
             if (state["winner"] != "empty"):
                 print("Winner = " + state["winner"])
+                print("Replay log = \n" + state["replay"])
                 break
 
             # AI LOGIC (random policy right now)

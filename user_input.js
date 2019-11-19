@@ -10,7 +10,7 @@ const WebSocket = require('ws');
 const wss = new WebSocket.Server({ port: 39999 });
 player_1 = {"buffs":{"atk":0,"def":0,"spe":0,"spa":0,"spd":0,"evasion":0,"accuracy":0}, "confusion":false};
 player_2 = {"buffs":{"atk":0,"def":0,"spe":0,"spa":0,"spd":0,"evasion":0,"accuracy":0}, "confusion":false};
-
+replay_log = ""
 
 function aiRequiresAction(output) {
     msgLines = output.split('\n');
@@ -35,6 +35,10 @@ function containsWinStr(output) {
     return output.includes(WIN_STRING);
 }
 function parseServerOutput(output) {
+
+    if (!output.includes("|request|")) { // Add everythin else to replay log
+        replay_log += output
+    }
     
     if (output.includes("|request|")) {
         token = "|request|"
@@ -275,6 +279,8 @@ wss.on('connection', function connection(ws) {
 
         //console.log('received: %s', action);
         if (action == "new_game") {
+
+            replay_log = "" // Refresh replay log every game
             stream = new Sim.BattleStream();
             stream.write(`>start {"formatid":"gen1ou"}`);
             stream.write(`>player p1 {"name":"Alice"}`);
@@ -310,7 +316,7 @@ wss.on('connection', function connection(ws) {
                                 }
                             }
                             // process.stdin.pause();
-                            ws.send(JSON.stringify({"player1":player_1,"player2":player_2,"winner":winner}));
+                            ws.send(JSON.stringify({"player1":player_1,"player2":player_2,"winner":winner,"replay":replay_log}));
                         }
                         // Detect if we need players to choose actions
                         else if (aiRequiresAction(output)) {
