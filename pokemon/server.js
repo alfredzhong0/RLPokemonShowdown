@@ -1,6 +1,6 @@
 const WebSocket = require('ws');
 
-const wss = new WebSocket.Server({ port: 8080 });
+const wss = new WebSocket.Server({ port: 30680 });
 class Env {
   constructor() {
     // Contains the HP of each pokemon and the moveset
