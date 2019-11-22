@@ -41,16 +41,18 @@ async def test_random_policy():
     async with websockets.connect(uri) as websocket:
 
         await websocket.send("new_game")
+        get_first_state = False
         while (True):
             state_msg = await websocket.recv()
 
-
-            #print("\nReceived state: " + state_msg)
+            if not get_first_state:
+                print("\nReceived state: " + state_msg)
+                get_first_state = True
             state = json.loads(state_msg)
 
             if (state["winner"] != "empty"):
                 print("Winner = " + state["winner"])
-                print("Replay log = \n" + state["replay"])
+                #print("Replay log = \n" + state["replay"])
                 break
 
             # AI LOGIC (random policy right now)
@@ -106,8 +108,18 @@ async def test_random_policy():
 
 
             action = json.dumps({"p1":p1move, "p2":p2move})
-            print("action = " + action)
+            #print("action = " + action)
             await websocket.send(action)
+
+async def reset_game_wrapper():
+    async with websockets.connect(uri) as websocket:
+        await websocket.send("new_game")
+        state_msg = await websocket.recv()
+        return state_msg
+
+
+def reset_game():
+    return asyncio.get_event_loop().run_until_complete(reset_game_wrapper())
 
 async def test_user_input():
     async with websockets.connect(uri) as websocket:
@@ -116,8 +128,11 @@ async def test_user_input():
         while (True):
             state_msg = await websocket.recv()
 
+            print("\n\n\n\n\n\nReceived state: " + state_msg)
+            """{"player1":{"buffs":{"atk":0,"def":0,"spe":0,"spa":0,"spd":0,"evasion":0,"accuracy":0},"confusion":false,"pokemons":[{"name":"Mewtwo","hp":0.5857605177993528,"active":true,"status":[0,0,0,0,0,0]},{"name":"Snorlax","hp":1,"active":false,"status":[0,0,0,0,0,0]}],"activemoves":[{"name":"splash","enabled":true},{"name":"reflect","enabled":true}]},"player2":{"buffs":{"atk":0,"def":0,"spe":0,"spa":0,"spd":0,"evasion":0,"accuracy":0},"confusion":false,"pokemons":[{"name":"Mew","hp":1,"active":true,"status":[0,0,0,0,0,0]}],"activemoves":[{"name":"splash","enabled":true},{"name":"haze","enabled":true},{"name":"earthquake","enabled":true}]},"winner":"empty"}"""
 
-            #print("\nReceived state: " + state_msg)
+           # 1v1 - p1 pokemon, p1 pokemon moves, buffs, confusion, status, p2 pokemon, p2 moves  
+
             state = json.loads(state_msg)
 
             if (state["winner"] != "empty"):
@@ -129,11 +144,9 @@ async def test_user_input():
             p2move = input("Player 2 action:")
 
             action = json.dumps({"p1":p1move, "p2":p2move})
-            print("action = " + action)
+            #print("action = " + action)
             await websocket.send(action)
 
-
 #asyncio.get_event_loop().run_until_complete(test_user_input())
-asyncio.get_event_loop().run_until_complete(test_random_policy())
+#asyncio.get_event_loop().run_until_complete(test_random_policy())
 
-#asyncio.run(hello())

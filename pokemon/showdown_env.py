@@ -4,26 +4,67 @@ import numpy as np
 import json
 from .client import send_action
 from .client import reset_server
+from .client import reset_game
+from .load_embeddings import load_embeddings
 
 class ShowdownEnv(gym.Env):
     
     # As a parameter, we also want to pass in the opponent's policy
     def __init__(self):
-        # Actions are Thunderbolt, Water Gun
-        """ Contains the HP of each pokemon and the moveset
-        Pokemon A is Pikachu 
-        23 is Thunderbolt, 12 is Bubble
-        Pokemon B is a Squirtle
-        32 is Water Gun and 0 is Splash
-        The first 100 is the HP of Pikachu and the second 100 is the HP of Squirtle"""
+        """{"player1":{"buffs":{"atk":0,"def":0,"spe":0,"spa":0,"spd":0,"evasion":0,"accuracy":0},"confusion":false,"pokemons":[{"name":"Mewtwo","hp":0.5857605177993528,"active":true,"status":[0,0,0,0,0,0]},{"name":"Snorlax","hp":1,"active":false,"status":[0,0,0,0,0,0]}],"activemoves":[{"name":"splash","enabled":true},{"name":"reflect","enabled":true}]},"player2":{"buffs":{"atk":0,"def":0,"spe":0,"spa":0,"spd":0,"evasion":0,"accuracy":0},"confusion":false,"pokemons":[{"name":"Mew","hp":1,"active":true,"status":[0,0,0,0,0,0]}],"activemoves":[{"name":"splash","enabled":true},{"name":"haze","enabled":true},{"name":"earthquake","enabled":true}]},"winner":"empty"}"""
+        
 
-        low = np.array([23, 12, 12, 0, 0, 0])
-        high = np.array([23, 12, 12, 0, 100, 100])
+        # Define the high and low input for the RL algo
+        # input vector:
+        # Low: [p1 active pokembedding: [-2] * 10 + active[0], p1 hp:[0],p1 moves: [-2] * 10 + disabled after each, p1 buffs [-6] * 6, p1 status [0] * 6, p1 confusion [0], p2 active pokembedding: [-2] * 10 + active[0]
+        # , p2 active hp: [0], p2 status[0] * 6, p2 confusion [0], 
+        pokembedding_low = np.array([-2] * 10) 
+        active_low = np.array([0])
+        active_pokembedding_low = np.concatenate((pokembedding_low, active_low), axis=0)
+        hp_low = np.array([0])
 
-        self.initial_state = np.array(high, copy=True)
-        self.state = np.array(self.initial_state, copy=True)
-        self.observation_space = spaces.Box(low,high)
-        self.action_space = spaces.Discrete(2)
+        movembedding_low = np.array([-2] * 10)
+        enabled_move_low = np.array([0])
+        move_low = np.concatenate((movembedding_low, enabled_move_low), axis=0)
+
+
+        buffs_low = np.array([-6] * 10)
+        status_low = np.array([0] * 6)
+        confusion_low = np.array([0])
+
+        p1_low = np.concatenate((active_pokembedding_low, hp_low, move_low, move_low, move_low, move_low, buffs_low, status_low, confusion_low), axis=0)
+        p2_low = np.concatenate((active_pokembedding_low, hp_low, move_low, move_low, move_low, move_low, buffs_low, status_low, confusion_low), axis=0)
+        
+        obs_low = np.concatenate((p1_low, p2_low), axis=0)
+        
+        pokembedding_high = np.array([2] * 10) 
+        active_high = np.array([1])
+        active_pokembedding_high = np.concatenate((pokembedding_high, active_high), axis=0)
+
+        hp_high = np.array([1])
+
+        movembedding_high = np.array([2] * 10)
+        enabled_move_high = np.array([1])
+        move_high = np.concatenate((movembedding_high, enabled_move_high), axis=0)
+
+
+        buffs_high = np.array([6] * 10)
+        status_high = np.array([1] * 6)
+        confusion_high = np.array([1])
+
+        p1_high = np.concatenate((active_pokembedding_high, hp_high, move_high, move_high, move_high, move_high, buffs_high, status_high, confusion_high), axis=0)
+        p2_high = np.concatenate((active_pokembedding_high, hp_high, move_high, move_high, move_high, move_high, buffs_high, status_high, confusion_high), axis=0)
+        
+        obs_high = np.concatenate((p1_high, p2_high), axis=0)
+       
+        self.observation_space = spaces.Box(obs_low, obs_high)
+        self.action_space = spaces.Discrete(9)
+        
+        # Load the move embeddings and the pokemon embeddings
+        self.move_dict, self.poke_dict = load_embeddings()
+
+    def vectorize_state():
+        pass 
 
     def step(self, action):
         info = {} 
@@ -50,8 +91,7 @@ class ShowdownEnv(gym.Env):
             return 0
 
     def reset(self):
-        res = reset_server()
-        res = json.loads(res)['obs']
-        obs = np.array(res)
-        self.state = np.array(obs, copy=True)
-        return obs
+        # Set the initial state and begin a game
+        self.state = reset_game()
+        print(self.state)
+        return self.state

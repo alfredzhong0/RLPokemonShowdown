@@ -283,10 +283,10 @@ wss.on('connection', function connection(ws) {
             replay_log = "" // Refresh replay log every game
             stream = new Sim.BattleStream();
             stream.write(`>start {"formatid":"gen1ou"}`);
-            //stream.write(`>player p1 {"name":"Alice"}`);
-            //stream.write(`>player p2 {"name":"Bob"}`);
-            stream.write(`>player p1 {"name":"Alice", "team": "Mewtwo|||none|splash,reflect||255,255,255,255,255,255||30,30,30,30,30,30||74|]Snorlax|||none|splash,reflect||255,255,255,255,255,255||30,30,30,30,30,30||74|"}`);
-            stream.write(`>player p2 {"name":"Bob", "team": "Mew|||none|splash,haze,earthquake||255,255,255,255,255,255||30,30,30,30,30,30||74|"}`);
+            stream.write(`>player p1 {"name":"Alice"}`);
+            stream.write(`>player p2 {"name":"Bob"}`);
+            //stream.write(`>player p1 {"name":"Alice", "team": "Mewtwo|||none|splash,reflect||255,255,255,255,255,255||30,30,30,30,30,30||74|]Snorlax|||none|splash,reflect||255,255,255,255,255,255||30,30,30,30,30,30||74|"}`);
+            //stream.write(`>player p2 {"name":"Bob", "team": "Mew|||none|splash,haze,earthquake||255,255,255,255,255,255||30,30,30,30,30,30||74|"}`);
 
             (async () => {
                 let output;

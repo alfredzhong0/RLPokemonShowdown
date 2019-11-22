@@ -14,7 +14,7 @@ class RandomGen1Teams extends RandomGen2Teams {
 
 		// Pick six random Pokémon, no repeats.
 		let num;
-		for (let i = 0; i < 6; i++) {
+		for (let i = 0; i < 1; i++) {
 			do {
 				num = this.random(151) + 1;
 			} while (num in hasDexNumber);
@@ -33,7 +33,7 @@ class RandomGen1Teams extends RandomGen2Teams {
 			}
 		}
 
-		for (let i = 0; i < 6; i++) {
+		for (let i = 0; i < 1; i++) {
 			// Choose forme.
 			let poke = this.sample(formes[i]);
 			let template = this.dex.getTemplate(poke);
@@ -147,7 +147,7 @@ class RandomGen1Teams extends RandomGen2Teams {
 		let nuCount = 0;
 		let hasShitmon = false;
 
-		while (pokemonPool.length && pokemonLeft < 6) {
+		while (pokemonPool.length && pokemonLeft < 1) {
 			let template = this.dex.getTemplate(this.sampleNoReplace(pokemonPool));
 			if (!template.exists) continue;
 
