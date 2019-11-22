@@ -13,7 +13,12 @@ def load_embeddings():
         reader = csv.reader(csv_file, delimiter=',', quotechar='"')
         for row in reader:
             name = row[0]
+            doubleedge = name == 'Double-Edge' 
+            name = name.replace(' ', '')
+            name = name.lower()
             vec = row[1:]
+            if doubleedge:
+                name = 'doubleedge'
             move_embeddings[name] = np.array(vec)
 
     poke_embeddings = {}
@@ -23,6 +28,5 @@ def load_embeddings():
             name = row[0]
             vec = row[1:]
             poke_embeddings[name] = np.array(vec)
-
     return move_embeddings, poke_embeddings
 
