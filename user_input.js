@@ -8,8 +8,8 @@ const WebSocket = require('ws');
 
 // Store the game state
 const wss = new WebSocket.Server({ port: 39999 });
-player_1 = {"buffs":{"atk":0,"def":0,"spe":0,"spa":0,"spd":0,"evasion":0,"accuracy":0}, "confusion":false};
-player_2 = {"buffs":{"atk":0,"def":0,"spe":0,"spa":0,"spd":0,"evasion":0,"accuracy":0}, "confusion":false};
+player_1 = {"buffs":{"atk":0,"def":0,"spe":0,"spa":0,"spd":0,"evasion":0,"accuracy":0}, "effects":[0,0,0,0]};
+player_2 = {"buffs":{"atk":0,"def":0,"spe":0,"spa":0,"spd":0,"evasion":0,"accuracy":0}, "effects":[0,0,0,0]};
 replay_log = ""
 
 function aiRequiresAction(output) {
@@ -211,15 +211,35 @@ function parseServerOutput(output) {
                 if (player1) player_1["buffs"][key] += increase
                 else player_2["buffs"][key] += increase
             }
-            else if (line.includes("|-start|") && line.includes("|confusion")) {
+            else if (line.includes("|-start|")) {
                 player1 = line.includes("p1a") ? true:false;
-                if (player1) player_1["confusion"] = true
-                else player_2["confusion"] = true
+                tags = ["|reflect", "|light screen", "leech seed", "|confuse"] // Note: we ignore mist effect, too different to code
+                idx = -1
+                for (var j = 0; j < tags.length; j++) {
+                    if (line.toLowerCase().includes(tags[j])) {
+                        idx = j;
+                        break;
+                    }
+                }
+                if (idx != -1) {
+                    if (player1) player_1["effects"][idx] = 1
+                    else player_2["effects"][idx] = 1
+                }
             }
-            else if (line.includes("|-end|") && line.includes("|confusion")) {
+            else if (line.includes("|-end|")) {
                 player1 = line.includes("p1a") ? true:false;
-                if (player1) player_1["confusion"] = false
-                else player_2["confusion"] = false
+                tags = ["|reflect", "|lightscreen", "|leechseed", "|confuse"] // Note: we ignore mist effect, too different to code
+                idx = -1
+                for (var j = 0; j < tags.length; j++) {
+                    if (line.toLowerCase().includes(tags[j])) {
+                        idx = j;
+                        break;
+                    }
+                }
+                if (idx != -1) {
+                    if (player1) player_1["effects"][idx] = 0
+                    else player_2["effects"][idx] = 0
+                }
             }
             else if (line.includes("|switch|")) {
                 player1 = line.includes("p1a") ? true:false;
@@ -227,34 +247,34 @@ function parseServerOutput(output) {
                 // Reset buffs,debuffs and confusion upon switch
                 if (player1) {
                     player_1["buffs"] = {"atk":0,"def":0,"spe":0,"spa":0,"spd":0,"evasion":0,"accuracy":0};
-                    player_1["confusion"] = false;
+                    player_1["effects"] = [0,0,0,0];
                 }
                 else {
                     player_2["buffs"] = {"atk":0,"def":0,"spe":0,"spa":0,"spd":0,"evasion":0,"accuracy":0}
-                    player_2["confusion"] = false
+                    player_2["effects"] = [0,0,0,0];
                 }
             }
         }
 
     }
 
-    // console.log('\nPlayer 1');
-    // //console.log(JSON.stringify(player_1))
-    // console.log(player_1)
-    // if ("pokemons" in player_1) {
-    // 	for (var i = 0; i < player_1["pokemons"].length; i++) {
-    // 		console.log(player_1["pokemons"][i]["name"] + ": " + player_1["pokemons"][i]["status"])
-    // 	}
-    // }
+    console.log('\nPlayer 1');
+    //console.log(JSON.stringify(player_1))
+    console.log(player_1)
+    if ("pokemons" in player_1) {
+    	for (var i = 0; i < player_1["pokemons"].length; i++) {
+    		console.log(player_1["pokemons"][i]["name"] + ": " + player_1["pokemons"][i]["status"])
+    	}
+    }
 
-    // console.log('\nPlayer 2');
-    // console.log(player_2)
-    // if ("pokemons" in player_2) {
-    // 	for (var i = 0; i < player_2["pokemons"].length; i++) {
-    // 		console.log(player_2["pokemons"][i]["name"] + ": " + player_2["pokemons"][i]["status"])
-    // 	}
-    // }
-    // //console.log(JSON.stringify(player_2))
+    console.log('\nPlayer 2');
+    console.log(player_2)
+    if ("pokemons" in player_2) {
+    	for (var i = 0; i < player_2["pokemons"].length; i++) {
+    		console.log(player_2["pokemons"][i]["name"] + ": " + player_2["pokemons"][i]["status"])
+    	}
+    }
+    //console.log(JSON.stringify(player_2))
     // console.log("\x1b[0m");
 
 
@@ -285,8 +305,8 @@ wss.on('connection', function connection(ws) {
             stream.write(`>start {"formatid":"gen1ou"}`);
             //stream.write(`>player p1 {"name":"Alice"}`);
             //stream.write(`>player p2 {"name":"Bob"}`);
-            stream.write(`>player p1 {"name":"Alice", "team": "Mewtwo|||none|splash,reflect||255,255,255,255,255,255||30,30,30,30,30,30||74|]Snorlax|||none|splash,reflect||255,255,255,255,255,255||30,30,30,30,30,30||74|"}`);
-            stream.write(`>player p2 {"name":"Bob", "team": "Mew|||none|splash,haze,earthquake||255,255,255,255,255,255||30,30,30,30,30,30||74|"}`);
+            stream.write(`>player p1 {"name":"Alice", "team": "Mewtwo|||none|splash,leechseed,haze||255,255,255,255,255,255||30,30,30,30,30,30||74|]Snorlax|||none|splash,reflect||255,255,255,255,255,255||30,30,30,30,30,30||74|"}`);
+            stream.write(`>player p2 {"name":"Bob", "team": "Mew|||none|splash,leechseed,haze||255,255,255,255,255,255||30,30,30,30,30,30||74|]Snorlax|||none|splash,reflect||255,255,255,255,255,255||30,30,30,30,30,30||74|"}`);
 
             (async () => {
                 let output;

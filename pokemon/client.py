@@ -133,7 +133,7 @@ async def test_user_input():
             await websocket.send(action)
 
 
-#asyncio.get_event_loop().run_until_complete(test_user_input())
-asyncio.get_event_loop().run_until_complete(test_random_policy())
+asyncio.get_event_loop().run_until_complete(test_user_input())
+#asyncio.get_event_loop().run_until_complete(test_random_policy())
 
 #asyncio.run(hello())
