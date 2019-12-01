@@ -2,6 +2,7 @@ import asyncio
 import websockets
 import json
 import random
+import numpy as np
 
 uri = "ws://localhost:39999"
 async def hello():
@@ -21,20 +22,30 @@ async def send_action_wrapper(action):
         res = await websocket.recv()
     return res
 
-async def reset_wrapper():
-    async with websockets.connect(uri) as websocket:
-        await websocket.send('reset')
-        print('Resetting state')
-        res = await websocket.recv()
-        print(res)
-    return res
-
 def send_action(action):
     action = str(action)
     return asyncio.get_event_loop().run_until_complete(send_action_wrapper(action))
 
-def reset_server():
-    return asyncio.get_event_loop().run_until_complete(reset_wrapper())
+async def send_agent_input_wrapper(action_a, action_b):
+    state_msg = {}
+    try :
+        async with websockets.connect(uri, ping_interval=None) as websocket:
+            action = json.dumps({"p1": action_a, "p2": action_b})
+            # Sending action
+            #print(action)
+            await websocket.send(action)
+            #print('waiting on state message')
+            state_msg = await websocket.recv()
+            #print('got state message')
+    except:
+        print('\n\n\n\nEXCEPTION!!!\n\n\n\n')
+        print(state_msg) 
+
+    return state_msg
+
+# Send input for two agents
+def send_agent_input(action_a, action_b):
+    return asyncio.get_event_loop().run_until_complete(send_agent_input_wrapper(action_a, action_b))
 
 
 async def test_random_policy():
@@ -112,10 +123,18 @@ async def test_random_policy():
             await websocket.send(action)
 
 async def reset_game_wrapper():
-    async with websockets.connect(uri) as websocket:
-        await websocket.send("new_game")
-        state_msg = await websocket.recv()
-        return state_msg
+    state_msg = {}
+    try:
+        async with websockets.connect(uri, ping_interval=None) as websocket:
+            await websocket.send("new_game")
+            state_msg = await websocket.recv()
+
+    except:
+        print('\n\n\n\nEXCEPTION!!!!\n\n\n\n\n')
+        print(state_msg)
+    
+    return state_msg
+
 
 
 def reset_game():

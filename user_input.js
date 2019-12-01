@@ -8,8 +8,8 @@ const WebSocket = require('ws');
 
 // Store the game state
 const wss = new WebSocket.Server({ port: 39999 });
-player_1 = {"buffs":{"atk":0,"def":0,"spe":0,"spa":0,"spd":0,"evasion":0,"accuracy":0}, "effects":[0,0,0,0]};
-player_2 = {"buffs":{"atk":0,"def":0,"spe":0,"spa":0,"spd":0,"evasion":0,"accuracy":0}, "effects":[0,0,0,0]};
+player_1 = {"buffs":{"atk":0,"def":0,"spe":0,"spa":0,"spd":0,"evasion":0,"accuracy":0}, "effects":[0,0,0,0], "last_move": ""};
+player_2 = {"buffs":{"atk":0,"def":0,"spe":0,"spa":0,"spd":0,"evasion":0,"accuracy":0}, "effects":[0,0,0,0], "last_move": ""};
 replay_log = ""
 
 function aiRequiresAction(output) {
@@ -250,14 +250,20 @@ function parseServerOutput(output) {
                     player_1["effects"] = [0,0,0,0];
                 }
                 else {
-                    player_2["buffs"] = {"atk":0,"def":0,"spe":0,"spa":0,"spd":0,"evasion":0,"accuracy":0}
+                    player_2["buffs"] = {"atk":0,"def":0,"spe":0,"spa":0,"spd":0,"evasion":0,"accuracy":0};
                     player_2["effects"] = [0,0,0,0];
                 }
             }
+
+	   if (line.includes("|move|")) {
+                player1 = line.includes("p1a") ? true:false;
+		const splitLine = line.split("|");
+		player_1["last_move"] = splitLine[3].toLowerCase();
+	   }
         }
 
     }
-
+    /*    
     console.log('\nPlayer 1');
     //console.log(JSON.stringify(player_1))
     console.log(player_1)
@@ -273,10 +279,10 @@ function parseServerOutput(output) {
     	for (var i = 0; i < player_2["pokemons"].length; i++) {
     		console.log(player_2["pokemons"][i]["name"] + ": " + player_2["pokemons"][i]["status"])
     	}
-    }
+    }*/
     //console.log(JSON.stringify(player_2))
     // console.log("\x1b[0m");
-
+     
 
 }
 
@@ -299,15 +305,14 @@ wss.on('connection', function connection(ws) {
 
         //console.log('received: %s', action);
         if (action == "new_game") {
-
             replay_log = "" // Refresh replay log every game
             stream = new Sim.BattleStream();
             stream.write(`>start {"formatid":"gen1ou"}`);
-            stream.write(`>player p1 {"name":"Alice"}`);
-            stream.write(`>player p2 {"name":"Bob"}`);
-            //stream.write(`>player p1 {"name":"Alice", "team": "Mewtwo|||none|splash,leechseed,haze||255,255,255,255,255,255||30,30,30,30,30,30||74|]Snorlax|||none|splash,reflect||255,255,255,255,255,255||30,30,30,30,30,30||74|"}`);
-            //stream.write(`>player p2 {"name":"Bob", "team": "Mew|||none|splash,leechseed,haze||255,255,255,255,255,255||30,30,30,30,30,30||74|]Snorlax|||none|splash,reflect||255,255,255,255,255,255||30,30,30,30,30,30||74|"}`);
-
+            //stream.write(`>player p1 {"name":"Alice"}`);
+            //stream.write(`>player p2 {"name":"Bob"}`);
+            stream.write(`>player p1 {"name":"Alice", "team": "Raichu|||none|thunderbolt,splash||255,255,255,255,255,255||30,30,30,30,30,30||74|"}`);
+            stream.write(`>player p2 {"name":"Bob", "team": "Squirtle|||none|tackle,splash,watergun,scratch||255,255,255,255,255,255||30,30,30,30,30,30||74|"}`);
+	
             (async () => {
                 let output;
                 iter = 0;
@@ -336,16 +341,26 @@ wss.on('connection', function connection(ws) {
                                 }
                             }
                             // process.stdin.pause();
-                            ws.send(JSON.stringify({"player1":player_1,"player2":player_2,"winner":winner,"replay":replay_log}));
+		            wss.clients.forEach(function (client) {
+				 client.send(JSON.stringify({"player1":player_1,"player2":player_2,"winner": winner, 'replay': replay_log}));
+				 console.log('\n\nSending winner\n\n')
+				 client.close()
+			    })
+		            console.log('Done sending winner');
                         }
                         // Detect if we need players to choose actions
                         else if (aiRequiresAction(output)) {
-                            ws.send(JSON.stringify({"player1":player_1,"player2":player_2,"winner":"empty"}));
+		            console.log('Sending State!!!')
+		            wss.clients.forEach(function (client) {
+				 client.send(JSON.stringify({"player1":player_1,"player2":player_2,"winner":"empty"}));
+				 client.terminate()
+			    })
                         }
                         
                     }
                 }
                 stream.end();
+		console.log('Stream over!');
             })();
             
         }
