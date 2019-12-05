@@ -1,4 +1,5 @@
 import random
+import os, os.path
 import time
 import json
 import gym
@@ -9,15 +10,25 @@ from .client import send_agent_input
 from .client import reset_game
 from .load_embeddings import load_embeddings
 
-class ShowdownEnv(gym.Env):
+class ShowdownEnv(gym.GoalEnv):
     
-    def __init__(self, model=None, log_dir='./replay_logs'):
+    def __init__(self, model=None, log_dir='./replay_logs', HER=False, num_pokemon=1):
         """{"player1":{"buffs":{"atk":0,"def":0,"spe":0,"spa":0,"spd":0,"evasion":0,"accuracy":0},"effects":[0,0,0,0],
         "pokemons":[{"name":"Mewtwo","hp":1,"active":true,"status":[0,0,0,0,0,0]},{"name":"Snorlax","hp":1,"active":false,"status":[0,0,0,0,0,0]}],"activemoves":[{"name":"splash","enabled":true},{"name":"leechseed","enabled":true},{"name":"haze","enabled":true}]},"player2":{"buffs":{"atk":0,"def":0,"spe":0,"spa":0,"spd":0,"evasion":0,"accuracy":0},"effects":[0,0,0,0],"pokemons":[{"name":"Mew","hp":1,"active":true,"status":[0,0,0,0,0,0]},{"name":"Snorlax","hp":1,"active":false,"status":[0,0,0,0,0,0]}],"activemoves":[{"name":"splash","enabled":true},{"name":"leechseed","enabled":true}, {"name":"haze","enabled":true}]},"winner":"empty"}""" 
         # Input dimensions and their high and low values 
         obs_low, obs_high = self.high_low() 
-        # State space
-        self.observation_space = spaces.Box(obs_low, obs_high) 
+        # State space for regular algorithms
+        if not HER: 
+            self.observation_space = spaces.Box(obs_low, obs_high) 
+        # State space for hindsight experience replay
+        else:
+            self.observation_space = spaces.Dict({\
+                    'observation': spaces.Box(obs_low, obs_high),
+                    'achieved_goal': spaces.Box(obs_low, obs_high),
+                    'desired_goal': spaces.Box(obs_low, obs_high)
+                    })
+        self.replay_text = None
+        self.steps = 0
         # Action space
         self.action_space = spaces.Discrete(9) 
         self.log_dir = log_dir
@@ -25,6 +36,7 @@ class ShowdownEnv(gym.Env):
         self.move_dict, self.poke_dict = load_embeddings()
         self.log_dir = log_dir
         self.agent_model = model
+        self.num_pokemon = num_pokemon
     
     def set_model(self, model):
         print(model)
@@ -33,7 +45,9 @@ class ShowdownEnv(gym.Env):
     def step(self, action):
         info = {} 
         # Set the reward to -0.1 by default so the agent finishes battles as quickly as possible
-        reward = -1
+        # reward = -1
+        # Alternatively, set the reward to 0. This may reduce reward variance.
+        reward = 0
         done = False
         # Get the action text to send to the simulator
         agent_action, valid_action = self.get_action(self.agent_model, self.agent_obs, 'player1')
@@ -45,15 +59,25 @@ class ShowdownEnv(gym.Env):
         # Assign a positive reward for a win and a negative reward for a loss
         #print('Winner State:', self.raw_state['winner'])
         if self.raw_state["winner"] != "empty":
-                print('Game is complete!')
+                #print('Game is complete!')
                 done = True
+                self.steps = 0
                 reward = 15 if 'Alice' in self.raw_state['winner'] else -15
-                print("Winner = " + self.raw_state["winner"])
-                self.write_replay_log()
+                #print("Winner = " + self.raw_state["winner"])
+                # Save replay text because openai baselines, for whatever reason, does callbacks based on timesteps
+                self.replay_text = self.raw_state['replay']
+                #self.write_replay_log()
+
+        elif self.steps == 100:
+            self.steps = 0
+            reward = -15
+            done = True
+        else:
+            self.steps += 1
         """ 
         if not valid_action:
             reward = -10"""
-        print('Reward:', reward)
+        #print('Reward:', reward)
 
         obs = self.agent_obs
         return obs, reward, done, info     
@@ -61,15 +85,16 @@ class ShowdownEnv(gym.Env):
     # Set the initial state and begin a new game
     def reset(self):
         #print('\n\nReset Called\n\n')
-        self.raw_state = json.loads(reset_game())
+        self.raw_state = json.loads(reset_game(self.num_pokemon))
         self.agent_obs, self.opponent_obs = self.vectorize_obs(self.raw_state)
         return self.agent_obs
 
     # Normalize the action distribution to get only permissible actions
     def get_action(self, model, obs, player): 
-        action_dist = model.action_probability(obs)
+        action_dist = model.action_probability(obs, state=None)
         # Provide a negative reward if the chosen action is invalid
         chosen_action = np.argmax(action_dist)
+        force_switch = False
         move_name = self.raw_state[player]["activemoves"][0]["name"]
         # Set invalid moves to have a probability of 0     
         for i in range(len(self.raw_state[player]["activemoves"])):
@@ -78,23 +103,35 @@ class ShowdownEnv(gym.Env):
                 action_dist[i] = 0
             # If a pokemon on our side has fainted, we need to switch
             elif move_name == "SPECIAL_FORCE_SWITCH":
+                force_switch = True
                 action_dist[i] = 0
+                #print('Disabling {}'.format(i))
         # Account for number of moves the pokemon has
-        #print(self.raw_state[player]['activemoves'])
         for i in range(1, 4):
             if i > (len(self.raw_state[player]["activemoves"]) - 1):
                 action_dist[i] = 0
+                #print('Disabling {}'.format(i))
            
         
-        # Set invalid switches to have a probability of 0
-        for i in range(len(self.raw_state[player]["pokemons"])):
+        # Set invalid switches or trapped player switches to have a probability of 0
+        alive_pokemon = len(self.raw_state[player]['pokemons'])
+        if self.raw_state[player]['pokemons'][0]['hp'] == 0:
+            alive_pokemon -= 1
+
+        for i in range(1, len(self.raw_state[player]["pokemons"])):
             pokemon = self.raw_state[player]["pokemons"][i]
-            if (pokemon["hp"] == 0.0):
-                action_dist[i + 4] = 0 
+            #print('Trapped:', self.raw_state[player]['trapped'])
+            if (pokemon["hp"] == 0.0) or (self.raw_state[player]['trapped']):
+                #print('Disabling fainted switch')
+                alive_pokemon -= 1
+                action_dist[i + 3] = 0 
+                #print('Disabling {}'.format(i + 4))
         # Invalidate switches to nonexistent pokemon
         for i in range(2, 7):
-            if i > len(self.raw_state[player]["pokemons"]):
+            if i > alive_pokemon and not (force_switch and i == alive_pokemon + 1):
+                #print('Disabling nonexistent switch')
                 action_dist[i - 2 + 4] = 0
+        
         
         # Now normalize the probability of the action distribution
         action_dist /= np.sum(action_dist)
@@ -106,11 +143,11 @@ class ShowdownEnv(gym.Env):
         else:
             # switch 2...6
             action_text = 'switch ' +  str(action_discrete - 2)
-        print('Chosen action:', chosen_action)
+        #print('Chosen action:', chosen_action)
 
         # Return a negative reward for an invalid action
         valid_action = action_dist[chosen_action] > 0
-        print('Actual Action:', action_text)
+        #print('Actual Action:', action_text)
         return action_text, valid_action
 
     # Return a valid random move for the given player
@@ -146,11 +183,17 @@ class ShowdownEnv(gym.Env):
 
     # Write a replay log to a file
     def write_replay_log(self):
-        replay_text = self.raw_state['replay']
-        time_str = time.strftime('%Y%m%d-%H%M%S')
-        file_name = self.log_dir + '/' + time_str + '.log'
-        with open(file_name, 'w') as log_file:
-            log_file.write(replay_text)
+        # Create the "replays" directory if it doesn't exist
+        if not os.path.isdir(self.log_dir + '/replays'):
+            os.makedirs(self.log_dir + '/replays/')
+        # Write log if a replay is saved
+        replay_text = self.replay_text
+
+        if replay_text is not None:
+            time_str = time.strftime('%Y%m%d-%H%M%S')
+            file_name = self.log_dir + '/replays/' + time_str + '.log'
+            with open(file_name, 'w') as log_file:
+                log_file.write(replay_text)
 
     # Convert the observation we receive from the environment into a vector interpretable by our RL algo
     def vectorize_obs(self, obs):
@@ -159,6 +202,8 @@ class ShowdownEnv(gym.Env):
         for player in players:
             # Add player's last move to array
             last_move_raw = obs[player]['last_move'].lower() 
+            if last_move_raw != 'self-destruct':
+                last_move_raw = last_move_raw.replace('-', '')
             last_move_raw = last_move_raw.replace(' ', '')
             # Set the last move observation based on the move_dict if it exists, otherwise output a blank observation
             last_move_obs = self.move_dict[last_move_raw] if len(last_move_raw) > 0 else np.zeros((10))
@@ -172,12 +217,13 @@ class ShowdownEnv(gym.Env):
                     buff_obs[stat_num] = buff_dict[stat]
                     stat_num += 1
             # Set effect obs(ie. leech seed, confusion, reflect, light screen)
-            effect_obs = np.zeros((4))
+            effect_obs = np.zeros((5))
             effects = obs[player]['effects']
             effect_num = 0
             for effect in effects:
                 effect_obs[effect_num] = effect
                 effect_num += 1
+            effect_obs[4] = 0 if  obs[player]['trapped'] == False else 1
 
             pokemons = obs[player]['pokemons'] 
             pokes_obs = np.array([]) 
@@ -199,13 +245,14 @@ class ShowdownEnv(gym.Env):
                     active_moves = obs[player]['activemoves']
                     for move in active_moves:
                         # Get the move embedding based on the name
-                        move_embedding = self.move_dict[move['name']]
-                        # Set whether the move is enabled or disabled
-                        enabled_obs = np.array([1]) if move['enabled'] else np.array([0])
-                        move_obs = np.concatenate((move_embedding, enabled_obs), axis=0)
-                        # Add the observation to the array of moves
-                        moves_obs = np.concatenate((moves_obs, move_obs), axis=0)
-                        num_moves += 1
+                        if move['name'] != 'SPECIAL_FORCE_SWITCH' and move['name'] != 'SPECIAL_FORCE_WAIT':
+                            move_embedding = self.move_dict[move['name']]
+                            # Set whether the move is enabled or disabled
+                            enabled_obs = np.array([1]) if move['enabled'] else np.array([0])
+                            move_obs = np.concatenate((move_embedding, enabled_obs), axis=0)
+                            # Add the observation to the array of moves
+                            moves_obs = np.concatenate((moves_obs, move_obs), axis=0)
+                            num_moves += 1
                     # Add zeroed-out vectors for move embeddings to keep size of input to neural net consistent while accounting for pokes with < 4 moves
                     while num_moves < 4:
                         # This is 1 x 11 because a move embedding is length 10 and the enabled/disabled boolean is length 1
@@ -246,7 +293,7 @@ class ShowdownEnv(gym.Env):
         last_move_low = np.array([-2] * 10)
         buffs_low = np.array([-6] * 6)
         status_low = np.array([0] * 6)
-        effects_low = np.array([0, 0, 0, 0])
+        effects_low = np.array([0, 0, 0, 0, 0])
 
         p1_low = np.concatenate((last_move_low, buffs_low, effects_low, active_pokembedding_low, status_low, hp_low, move_low, move_low, move_low, move_low), axis=0)
         p2_low = np.concatenate((last_move_low, buffs_low, effects_low, active_pokembedding_low, status_low, hp_low, move_low, move_low, move_low, move_low), axis=0)
@@ -266,11 +313,13 @@ class ShowdownEnv(gym.Env):
         last_move_high = np.array([2] * 10)
         buffs_high = np.array([6] * 6)
         status_high = np.array([1] * 6)
-        effects_high = np.array([1, 1, 1, 1])
+        effects_high = np.array([1, 1, 1, 1, 1])
 
         p1_high = np.concatenate((last_move_high, buffs_high, effects_high, active_pokembedding_high, status_high, hp_high, move_high, move_high, move_high, move_high), axis=0)
+        
         p2_high = np.concatenate((last_move_high, buffs_high, effects_high, active_pokembedding_high, status_high, hp_high, move_high, move_high, move_high, move_high), axis=0)
-        
+
         obs_high = np.concatenate((p1_high, p2_high), axis=0)
+        print(obs_low.shape)
+        print(obs_high.shape)
         return obs_low, obs_high
-        

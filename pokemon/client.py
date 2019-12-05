@@ -38,8 +38,9 @@ async def send_agent_input_wrapper(action_a, action_b):
             state_msg = await websocket.recv()
             #print('got state message')
     except:
-        print('\n\n\n\nEXCEPTION!!!\n\n\n\n')
-        print(state_msg) 
+        pass
+        #print('\n\n\n\nEXCEPTION!!!\n\n\n\n')
+        #print(state_msg) 
 
     return state_msg
 
@@ -122,11 +123,11 @@ async def test_random_policy():
             #print("action = " + action)
             await websocket.send(action)
 
-async def reset_game_wrapper():
+async def reset_game_wrapper(num_pokemon):
     state_msg = {}
     try:
         async with websockets.connect(uri, ping_interval=None) as websocket:
-            await websocket.send("new_game")
+            await websocket.send("new_game," + str(num_pokemon))
             state_msg = await websocket.recv()
 
     except:
@@ -137,8 +138,8 @@ async def reset_game_wrapper():
 
 
 
-def reset_game():
-    return asyncio.get_event_loop().run_until_complete(reset_game_wrapper())
+def reset_game(num_pokemon):
+    return asyncio.get_event_loop().run_until_complete(reset_game_wrapper(num_pokemon))
 
 async def test_user_input():
     async with websockets.connect(uri) as websocket:

@@ -21,6 +21,10 @@ def load_embeddings():
                 name = 'water gun'
                 print(name)"""
             move_embeddings[name] = np.array(vec)
+            if name == 'self-destruct':
+                move_embeddings['selfdestruct'] = move_embeddings[name]
+            elif name == 'double-edge':
+                move_embeddings['doubleedge'] = move_embeddings[name]
 
     poke_embeddings = {}
     with open(poke_path, 'r', newline='') as csv_file:
