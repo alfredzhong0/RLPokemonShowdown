@@ -50,7 +50,7 @@ class ShowdownEnv(gym.GoalEnv):
         reward = 0
         done = False
         # Get the action text to send to the simulator
-        agent_action, valid_action = self.get_action(self.agent_model, self.agent_obs, 'player1')
+        agent_action = self.get_action(self.agent_model, self.agent_obs, 'player1')
         # Have the opponent be a random agent for now
         opp_action = self.get_random_action('player2')
         # Send the action to the simulator and get the new observation
@@ -62,7 +62,8 @@ class ShowdownEnv(gym.GoalEnv):
                 #print('Game is complete!')
                 done = True
                 self.steps = 0
-                reward = 15 if 'Alice' in self.raw_state['winner'] else -15
+                reward = 1 if 'Alice' in self.raw_state['winner'] else -1
+                #print(self.raw_state['winner'])
                 #print("Winner = " + self.raw_state["winner"])
                 # Save replay text because openai baselines, for whatever reason, does callbacks based on timesteps
                 self.replay_text = self.raw_state['replay']
@@ -70,13 +71,10 @@ class ShowdownEnv(gym.GoalEnv):
 
         elif self.steps == 100:
             self.steps = 0
-            reward = -15
+            reward = -1
             done = True
         else:
             self.steps += 1
-        """ 
-        if not valid_action:
-            reward = -10"""
         #print('Reward:', reward)
 
         obs = self.agent_obs
@@ -93,7 +91,7 @@ class ShowdownEnv(gym.GoalEnv):
     def get_action(self, model, obs, player): 
         action_dist = model.action_probability(obs, state=None)
         # Provide a negative reward if the chosen action is invalid
-        chosen_action = np.argmax(action_dist)
+        #chosen_action = np.argmax(action_dist)
         force_switch = False
         move_name = self.raw_state[player]["activemoves"][0]["name"]
         # Set invalid moves to have a probability of 0     
@@ -137,7 +135,8 @@ class ShowdownEnv(gym.GoalEnv):
         action_dist /= np.sum(action_dist)
 
         # Select an action
-        action_discrete = np.argmax(action_dist)
+        #print('Choice result:', np.random.choice(np.arange(0, 9, 1), p=action_dist))
+        action_discrete = np.random.choice(np.arange(0, 9, 1), p=action_dist)
         if action_discrete < 4:
             action_text = 'move ' + self.raw_state[player]["activemoves"][action_discrete]["name"]
         else:
@@ -146,9 +145,9 @@ class ShowdownEnv(gym.GoalEnv):
         #print('Chosen action:', chosen_action)
 
         # Return a negative reward for an invalid action
-        valid_action = action_dist[chosen_action] > 0
+        #valid_action = action_dist[chosen_action] > 0
         #print('Actual Action:', action_text)
-        return action_text, valid_action
+        return action_text
 
     # Return a valid random move for the given player
     def get_random_action(self, player):

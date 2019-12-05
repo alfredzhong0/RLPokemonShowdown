@@ -324,19 +324,20 @@ function shuffleList(a) {
 function generateRandomTeam(teamsize) {
 
 	available_pokemon = [
-			"Pikachu|||none|quickattack,thunderbolt,thunderwave,splash||255,255,255,255,255,255||30,30,30,30,30,30||74|",
+		
+			"Raichu|||none|quickattack,thunderbolt,thunderwave,splash||255,255,255,255,255,255||30,30,30,30,30,30||74|",
 			"Onix|||none|earthquake,rockslide,slam,selfdestruct||255,255,255,255,255,255||30,30,30,30,30,30||74|",
 			"Alakazam|||none|reflect,splash,psychic,selfdestruct||255,255,255,255,255,255||30,30,30,30,30,30||74|",
 			"Blastoise|||none|hydropump,splash,blizzard,seismictoss||255,255,255,255,255,255||30,30,30,30,30,30||74|",
 			"Charizard|||none|flamethrower,dig,swordsdance,selfdestruct||255,255,255,255,255,255||30,30,30,30,30,30||74|",
-			"Gengar|||none|confuseray,hypnosis,psychic,submission||255,255,255,255,255,255||30,30,30,30,30,30||74|",
-			"Hitmonchan|||none|firepunch,icepunch,thunderpunch,megapunch||255,255,255,255,255,255||30,30,30,30,30,30||74|",
-			"Venusaur|||none|leechseed,razorleaf,bodyslam,rest||255,255,255,255,255,255||30,30,30,30,30,30||74|",
+			/*"Gengar|||none|confuseray,hypnosis,psychic,submission||255,255,255,255,255,255||30,30,30,30,30,30||74|",
+			"Hitmonchan|||none|firepunch,icepunch,thunderpunch,megapunch||255,255,255,255,255,255||30,30,30,30,30,30||74|",*/
+			/*"Venusaur|||none|leechseed,razorleaf,bodyslam,rest||255,255,255,255,255,255||30,30,30,30,30,30||74|"*//*,
 			"Cubone|||none|bodyslam,bonemerang,blizzard,earthquake||255,255,255,255,255,255||30,30,30,30,30,30||74|",
 			"Weezing|||none|splash,sludge,thunder,fireblast||255,255,255,255,255,255||30,30,30,30,30,30||74|",
 			"Scyther|||none|swordsdance,slash,quickattack,skullbash||255,255,255,255,255,255||30,30,30,30,30,30||74|",
 			"Jynx|||none|lovelykiss,psychic,toxic,blizzard||255,255,255,255,255,255||30,30,30,30,30,30||74|",
-			"Exeggutor|||none|stomp,reflect,explosion,takedown||255,255,255,255,255,255||30,30,30,30,30,30||74|",
+			"Exeggutor|||none|stomp,reflect,explosion,takedown||255,255,255,255,255,255||30,30,30,30,30,30||74|",*/
 		];
 
 	available_pokemon = shuffleList(available_pokemon)
@@ -369,6 +370,9 @@ wss.on('connection', function connection(ws) {
 	
             stream.write(`>player p1 {"name":"Alice", "team": "` + generateRandomTeam(teamSize) + `"}`);
             stream.write(`>player p2 {"name":"Bob", "team": "` + generateRandomTeam(teamSize) + `"}`);
+	    /*stream.write(`>player p1 {"name":"Alice", "team": "Raichu|||none|thunderbolt,splash, selfdestruct, explosion||255,255,255,255,255,255||30,30,30,30,30,30||74|"}`);
+            stream.write(`>player p2 {"name":"Bob", "team": "Squirtle|||none|tackle,splash,watergun,scratch||255,255,255,255,255,255||30,30,30,30,30,30||74|"}`);*/
+
             (async () => {
                 let output;
                 iter = 0;
