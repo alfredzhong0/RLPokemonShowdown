@@ -16,10 +16,12 @@ from .load_embeddings import load_embeddings
 
 class ShowdownEnv(gym.GoalEnv):
     
-    def __init__(self, model=None, log_dir='./replay_logs', HER=False, num_pokemon=1, new_opp_model_every_x_episodes=1000, opp_model=True):
+    def __init__(self, model=None, log_dir='./replay_logs', HER=False, num_pokemon=1, new_opp_model_every_x_episodes=1000, opp_model=True, update_model=True):
         """{"player1":{"buffs":{"atk":0,"def":0,"spe":0,"spa":0,"spd":0,"evasion":0,"accuracy":0},"effects":[0,0,0,0],
         "pokemons":[{"name":"Mewtwo","hp":1,"active":true,"status":[0,0,0,0,0,0]},{"name":"Snorlax","hp":1,"active":false,"status":[0,0,0,0,0,0]}],"activemoves":[{"name":"splash","enabled":true},{"name":"leechseed","enabled":true},{"name":"haze","enabled":true}]},"player2":{"buffs":{"atk":0,"def":0,"spe":0,"spa":0,"spd":0,"evasion":0,"accuracy":0},"effects":[0,0,0,0],"pokemons":[{"name":"Mew","hp":1,"active":true,"status":[0,0,0,0,0,0]},{"name":"Snorlax","hp":1,"active":false,"status":[0,0,0,0,0,0]}],"activemoves":[{"name":"splash","enabled":true},{"name":"leechseed","enabled":true}, {"name":"haze","enabled":true}]},"winner":"empty"}""" 
         # Input dimensions and their high and low values 
+
+        self.update_model = update_model
         self.num_pokemon = num_pokemon
         obs_low, obs_high = self.high_low() 
         # State space for regular algorithms
@@ -48,18 +50,26 @@ class ShowdownEnv(gym.GoalEnv):
         self.has_opp_model = opp_model
         self.new_opp_model_every_x_episodes = new_opp_model_every_x_episodes
 
-    def set_model(self, model):
+    def set_model(self, model, opponent_model=None):
         self.agent_model = model
+
         if self.has_opp_model:
             env = gym.make('Pokemon-v0', log_dir='', HER=False, num_pokemon=self.num_pokemon, opp_model=False) 
             self.dummy_env = DummyVecEnv([lambda: env])
             print(self.dummy_env.action_space)
+            
             opp_model = PPO2(MlpPolicy, self.dummy_env)
-            opp_model.load_parameters(self.agent_model.get_parameters())
+
+            if (opponent_model):
+                opp_model.load_parameters(opponent_model.get_parameters())
+            # else:
+            #     opp_model.load_parameters(self.agent_model.get_parameters())
+
             # Set the loss/win ratio to 1 so the opponent has a chance of picking the new model
             self.opp_losses = np.array([1])
             self.opp_wins = np.array([1])
             self.opp_models = [opp_model]
+
     
 
     
@@ -127,18 +137,20 @@ class ShowdownEnv(gym.GoalEnv):
                 #self.write_replay_log()
                 # Update the episode count - used to determine if a new model should be added
                 self.episode_count += 1
-                if self.episode_count % self.new_opp_model_every_x_episodes == 0:
-                    new_opp_model = PPO2(MlpPolicy, self.dummy_env)
-                    new_opp_model.load_parameters(self.agent_model.get_parameters())
-                    self.add_opp_model(new_opp_model)
-                    self.episode_count = 0
-                    # Write agent win loss rates to csv
-                    write_dir = self.log_dir 
-                    if not os.path.exists(write_dir):
-                        os.makedirs(write_dir)
-                    with open (write_dir + 'agent_win_loss_ratio.csv', 'a') as csv_file:
-                        writer = csv.writer(csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_NONNUMERIC)
-                        writer.writerow(self.opp_losses/self.opp_wins)
+
+                if self.update_model:
+                    if self.episode_count % self.new_opp_model_every_x_episodes == 0:
+                        new_opp_model = PPO2(MlpPolicy, self.dummy_env)
+                        new_opp_model.load_parameters(self.agent_model.get_parameters())
+                        self.add_opp_model(new_opp_model)
+                        self.episode_count = 0
+                        # Write agent win loss rates to csv
+                        write_dir = self.log_dir 
+                        if not os.path.exists(write_dir):
+                            os.makedirs(write_dir)
+                        with open (write_dir + 'agent_win_loss_ratio.csv', 'a') as csv_file:
+                            writer = csv.writer(csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_NONNUMERIC)
+                            writer.writerow(self.opp_losses/self.opp_wins)
 
         elif self.steps == 50:
             self.steps = 0
