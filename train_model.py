@@ -58,13 +58,13 @@ log_time_str = None
 
 for i in range(epochs):
     # Create log dir with timestamp
-    log_dir = "./log_showdown/2v2_self_play/"
+    log_dir = "./log_showdown/2v2_random_policy/"
     time_str = time.strftime('%Y%m%d-%H%M%S')
     log_dir += time_str
     os.makedirs(log_dir, exist_ok=True)
 
     # Create and wrap the environment
-    base_env = gym.make('Pokemon-v0', log_dir=log_dir, HER=False, num_pokemon=2)
+    base_env = gym.make('Pokemon-v0', log_dir=log_dir, HER=False, num_pokemon=2, update_model=False, opponent_random_policy=True)
     env = Monitor(base_env, log_dir, allow_early_resets=True)
     env = DummyVecEnv([lambda: env])
     model = PPO2(MlpPolicy, env, verbose=0)

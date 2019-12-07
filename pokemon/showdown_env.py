@@ -39,7 +39,7 @@ class ShowdownEnv(gym.GoalEnv):
         self.steps = 0
         self.episode_count = 1
         # Action space
-        self.action_space = spaces.Discrete(4) 
+        self.action_space = spaces.Discrete(9) 
         self.log_dir = log_dir
         # Load the move embeddings and the pokemon embeddings
         self.move_dict, self.poke_dict = load_embeddings()
@@ -194,11 +194,13 @@ class ShowdownEnv(gym.GoalEnv):
             move = self.raw_state[player]["activemoves"][i]
             if move["enabled"] == True:
                 valid_actions[i] = True
-            elif move_name == "SPECIAL_FORCE_SWITCH":
-                force_switch = True
-                break
             else:
                 valid_actions[i] = False
+
+            if move_name == "SPECIAL_FORCE_SWITCH":
+                force_switch = True
+                break
+            
         if not valid_actions[action]:
             return '', False
         # Set nonexistent moves as invalid
@@ -391,9 +393,9 @@ class ShowdownEnv(gym.GoalEnv):
 
         p1_low = np.concatenate((last_move_low, buffs_low, effects_low, active_pokembedding_low, status_low, hp_low, move_low, move_low, move_low, move_low), axis=0)
         p2_low = np.concatenate((last_move_low, buffs_low, effects_low, active_pokembedding_low, status_low, hp_low, move_low, move_low, move_low, move_low), axis=0)
-        for i in range(2, self.num_pokemon):
-            p1_low = np.concatenate(active_pokembedding_low, status_low, hp_low)
-            p2_low = np.concatenate(active_pokembedding_low, status_low, hp_low)
+        for i in range(1, self.num_pokemon):
+            p1_low = np.concatenate((p1_low, active_pokembedding_low, status_low, hp_low))
+            p2_low = np.concatenate((p2_low, active_pokembedding_low, status_low, hp_low)) 
 
 
 
@@ -417,9 +419,9 @@ class ShowdownEnv(gym.GoalEnv):
         p1_high = np.concatenate((last_move_high, buffs_high, effects_high, active_pokembedding_high, status_high, hp_high, move_high, move_high, move_high, move_high), axis=0)
         
         p2_high = np.concatenate((last_move_high, buffs_high, effects_high, active_pokembedding_high, status_high, hp_high, move_high, move_high, move_high, move_high), axis=0)
-        for i in range(2, self.num_pokemon):
-            p1_low = np.concatenate(active_pokembedding_high, status_high, hp_high)
-            p2_low = np.concatenate(active_pokembedding_high, status_high, hp_high)
+        for i in range(1, self.num_pokemon):
+            p1_high = np.concatenate((p1_high, active_pokembedding_high, status_high, hp_high))
+            p2_high = np.concatenate((p2_high, active_pokembedding_high, status_high, hp_high))
 
         obs_high = np.concatenate((p1_high, p2_high), axis=0)
         print(obs_low.shape)
