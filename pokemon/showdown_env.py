@@ -16,12 +16,13 @@ from .load_embeddings import load_embeddings
 
 class ShowdownEnv(gym.GoalEnv):
     
-    def __init__(self, model=None, log_dir='./replay_logs', HER=False, num_pokemon=1, new_opp_model_every_x_episodes=1000, opp_model=True, update_model=True):
+    def __init__(self, model=None, log_dir='./replay_logs', HER=False, num_pokemon=1, new_opp_model_every_x_episodes=1000, opp_model=True, update_model=True, opponent_random_policy=False):
         """{"player1":{"buffs":{"atk":0,"def":0,"spe":0,"spa":0,"spd":0,"evasion":0,"accuracy":0},"effects":[0,0,0,0],
         "pokemons":[{"name":"Mewtwo","hp":1,"active":true,"status":[0,0,0,0,0,0]},{"name":"Snorlax","hp":1,"active":false,"status":[0,0,0,0,0,0]}],"activemoves":[{"name":"splash","enabled":true},{"name":"leechseed","enabled":true},{"name":"haze","enabled":true}]},"player2":{"buffs":{"atk":0,"def":0,"spe":0,"spa":0,"spd":0,"evasion":0,"accuracy":0},"effects":[0,0,0,0],"pokemons":[{"name":"Mew","hp":1,"active":true,"status":[0,0,0,0,0,0]},{"name":"Snorlax","hp":1,"active":false,"status":[0,0,0,0,0,0]}],"activemoves":[{"name":"splash","enabled":true},{"name":"leechseed","enabled":true}, {"name":"haze","enabled":true}]},"winner":"empty"}""" 
         # Input dimensions and their high and low values 
 
         self.update_model = update_model
+        self.opponent_random_policy = opponent_random_policy
         self.num_pokemon = num_pokemon
         obs_low, obs_high = self.high_low() 
         # State space for regular algorithms
@@ -96,6 +97,7 @@ class ShowdownEnv(gym.GoalEnv):
         if self.steps == 0:
             self.opp_idx = self.get_opponent_model()
             self.opp_model = self.opp_models[self.opp_idx]
+            #print("self.opp_models.length = " + str(len(self.opp_models)))
             #print('Playing opponent', self.opp_idx)
         # Get the action text to send to the simulator
         # Get the agent's action
@@ -104,8 +106,12 @@ class ShowdownEnv(gym.GoalEnv):
         opp_valid_action = False
         if agent_valid_action:
             while not opp_valid_action:
-                opp_action_discrete, _ = self.opp_model.predict(self.opponent_obs) 
-                opp_action, opp_valid_action = self.get_action(opp_action_discrete, 'player2')
+                if (self.opponent_random_policy): 
+                    opp_action = self.get_random_action("player2")
+                    opp_valid_action = True
+                else:
+                    opp_action_discrete, _ = self.opp_model.predict(self.opponent_obs)
+                    opp_action, opp_valid_action = self.get_action(opp_action_discrete, 'player2')
         """
         # Have the opponent be a random agent for now
         opp_action = self.get_random_action('player2')"""

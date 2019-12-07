@@ -20,17 +20,19 @@ time_str = time.strftime('%Y%m%d-%H%M%S')
 log_dir += time_str
 os.makedirs(log_dir, exist_ok=True)
 
-base_env = gym.make('Pokemon-v0', log_dir=log_dir, HER=False, num_pokemon=1)
+base_env = gym.make('Pokemon-v0', log_dir=log_dir, HER=False, num_pokemon=1, update_model=False, opponent_random_policy=True)
 
-# Load the trained agent
-#model = PPO2.load("./test.pkl")
-model = PPO2.load("log_showdown/1v1_meta/20191206-23535020191207-012940.pkl");
+# model1 = Alice
+# model2 = Bob
 
+model2 = PPO2.load("./gauraang.pkl")
+#model = PPO2.load("log_showdown/1v1_meta/20191206-23535020191207-012940.pkl");
 
 env = DummyVecEnv([lambda: base_env])
-model2 = PPO2(MlpPolicy, env, verbose=0) # effectively a random policy
+model1 = PPO2.load("log_showdown/1v1_meta/20191206-23535020191207-012940.pkl");
+#model2 = PPO2(MlpPolicy, env, verbose=0) # effectively a random policy
 
-base_env.set_model(model)
+base_env.set_model(model1, model2)
 
 
 # Evaluate the agent
@@ -40,7 +42,7 @@ base_env.set_model(model)
 num_games = 0
 wins = 0
 obs = base_env.reset()
-while num_games < 1000:
+while num_games < 10000:
     action, _states = model.predict(obs)
     #print(action)
     obs, reward, done, info = base_env.step(action)
@@ -50,7 +52,6 @@ while num_games < 1000:
     	if (reward == 1):
     		wins += 1
     	obs = base_env.reset()
-    #env.render()
 
 print("num_games = " + str(num_games))
 print("wins = (%d/%d)" % (wins,num_games))

@@ -46,7 +46,7 @@ def callback(_locals, _globals):
                 best_mean_reward = mean_reward
                 # Example for saving best model
                 print("Saving new best model")
-                _locals['self'].save(log_dir + 'best_model.pkl')
+                _locals['self'].save(log_dir + '/best_model.pkl')
             if n_steps % 10000 == 0:
                 print('Saving model')
                 time_str = time.strftime('%Y%m%d-%H%M%S')
