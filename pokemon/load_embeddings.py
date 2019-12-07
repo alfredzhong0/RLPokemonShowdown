@@ -25,7 +25,21 @@ def load_embeddings():
                 move_embeddings['selfdestruct'] = move_embeddings[name]
             elif name == 'double-edge':
                 move_embeddings['doubleedge'] = move_embeddings[name]
-
+            """
+            if name == 'thunderbolt':
+                move_embeddings['thunderbolt'] = np.array([1, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+            elif name == 'splash':
+                move_embeddings['splash'] = np.array([0, 1, 0, 0, 0, 0, 0 ,0, 0, 0])
+            elif name == 'self-destruct':
+                move_embeddings['splash'] = np.array([0, 0, 1, 0, 0, 0, 0 ,0, 0, 0])
+            elif name == 'tackle':
+                move_embeddings['tackle'] = np.array([0, 0, 0, 1, 0, 0, 0 ,0, 0, 0])
+            elif name == 'teleport':
+                move_embeddings['telport'] = np.array([0, 0, 0, 0, 1, 0, 0 ,0, 0, 0])
+            elif name == 'scratch':
+                move_embeddings['scratch'] = np.array([0, 0, 0, 0, 0, 1, 0 ,0, 0, 0])
+            elif name == 'watergun':
+                move_embeddings['watergun'] = np.array([0, 0, 0, 0, 0, 0, 1 ,0, 0, 0])"""
     poke_embeddings = {}
     with open(poke_path, 'r', newline='') as csv_file:
         reader = csv.reader(csv_file, delimiter=',', quotechar='"')

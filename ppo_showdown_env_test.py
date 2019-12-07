@@ -34,8 +34,8 @@ def callback(_locals, _globals):
         print('Saving Model...')
         time_str = time.strftime('%Y%m%d-%H%M%S')
         _locals['self'].save(log_dir + '/' + time_str + '.pkl')
-        # Evaluate policy training performance
-        x, y = ts2xy(load_results(log_dir), 'timesteps')
+        # Evaluate policy training performance 
+        x, y = ts2xy(load_results(log_dir), 'timesteps') 
         if len(x) > 0:
             mean_reward = np.mean(y[-100:])
             print('\n\nMean reward: {}\n\n'.format(mean_reward))

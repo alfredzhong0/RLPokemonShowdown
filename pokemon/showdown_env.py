@@ -30,7 +30,7 @@ class ShowdownEnv(gym.GoalEnv):
         self.replay_text = None
         self.steps = 0
         # Action space
-        self.action_space = spaces.Discrete(9) 
+        self.action_space = spaces.Discrete(4) 
         self.log_dir = log_dir
         # Load the move embeddings and the pokemon embeddings
         self.move_dict, self.poke_dict = load_embeddings()
@@ -39,7 +39,6 @@ class ShowdownEnv(gym.GoalEnv):
         self.num_pokemon = num_pokemon
     
     def set_model(self, model):
-        print(model)
         self.agent_model = model
 
     def step(self, action):
@@ -47,33 +46,43 @@ class ShowdownEnv(gym.GoalEnv):
         # Set the reward to -0.1 by default so the agent finishes battles as quickly as possible
         # reward = -1
         # Alternatively, set the reward to 0. This may reduce reward variance.
-        reward = 0
+        #reward = -1
         done = False
+        reward = 0
         # Get the action text to send to the simulator
-        agent_action = self.get_action(self.agent_model, self.agent_obs, 'player1')
+        agent_action, valid_action = self.get_action(action, 'player1')
         # Have the opponent be a random agent for now
         opp_action = self.get_random_action('player2')
         # Send the action to the simulator and get the new observation
-        self.raw_state = json.loads(send_agent_input(agent_action, opp_action))
-        self.agent_obs, self.opponent_obs = self.vectorize_obs(self.raw_state)
+        if valid_action:
+            self.raw_state = json.loads(send_agent_input(agent_action, opp_action))
+            self.agent_obs, self.opponent_obs = self.vectorize_obs(self.raw_state)
+        #print(self.agent_obs)
         # Assign a positive reward for a win and a negative reward for a loss
         #print('Winner State:', self.raw_state['winner'])
+        #reward = 1 if used_thunderbolt else -1
         if self.raw_state["winner"] != "empty":
                 #print('Game is complete!')
                 done = True
-                self.steps = 0
                 reward = 1 if 'Alice' in self.raw_state['winner'] else -1
+                #print('\n\n\n' + self.raw_state['winner'])
+                #print('Steps:', self.steps)
+                #print('Reward:', reward)
+                self.steps = 0
                 #print(self.raw_state['winner'])
                 #print("Winner = " + self.raw_state["winner"])
                 # Save replay text because openai baselines, for whatever reason, does callbacks based on timesteps
                 self.replay_text = self.raw_state['replay']
                 #self.write_replay_log()
 
-        elif self.steps == 100:
+        elif self.steps == 50:
             self.steps = 0
             reward = -1
             done = True
         else:
+            reward = reward if valid_action else -1
+            if not valid_action:
+                print('Invalid Action')
             self.steps += 1
         #print('Reward:', reward)
 
@@ -88,29 +97,35 @@ class ShowdownEnv(gym.GoalEnv):
         return self.agent_obs
 
     # Normalize the action distribution to get only permissible actions
-    def get_action(self, model, obs, player): 
-        action_dist = model.action_probability(obs, state=None)
+    def get_action(self, action, player): 
         # Provide a negative reward if the chosen action is invalid
         #chosen_action = np.argmax(action_dist)
+
         force_switch = False
         move_name = self.raw_state[player]["activemoves"][0]["name"]
         # Set invalid moves to have a probability of 0     
+        valid_actions = {}
         for i in range(len(self.raw_state[player]["activemoves"])):
             move = self.raw_state[player]["activemoves"][i]
-            if move["enabled"] == False:
-                action_dist[i] = 0
+            if move["enabled"] == True:
+                valid_actions[i] = True
+            else:
+                valid_actions[i] = False
+
+
             # If a pokemon on our side has fainted, we need to switch
+            """
             elif move_name == "SPECIAL_FORCE_SWITCH":
                 force_switch = True
-                action_dist[i] = 0
+                action_dist[i] = 0"""
                 #print('Disabling {}'.format(i))
         # Account for number of moves the pokemon has
         for i in range(1, 4):
             if i > (len(self.raw_state[player]["activemoves"]) - 1):
-                action_dist[i] = 0
+                valid_actions[i] = False
                 #print('Disabling {}'.format(i))
            
-        
+        """ 
         # Set invalid switches or trapped player switches to have a probability of 0
         alive_pokemon = len(self.raw_state[player]['pokemons'])
         if self.raw_state[player]['pokemons'][0]['hp'] == 0:
@@ -133,21 +148,30 @@ class ShowdownEnv(gym.GoalEnv):
         
         # Now normalize the probability of the action distribution
         action_dist /= np.sum(action_dist)
-
+        """
         # Select an action
         #print('Choice result:', np.random.choice(np.arange(0, 9, 1), p=action_dist))
-        action_discrete = np.random.choice(np.arange(0, 9, 1), p=action_dist)
-        if action_discrete < 4:
-            action_text = 'move ' + self.raw_state[player]["activemoves"][action_discrete]["name"]
+        #print(action_dist)
+        
+        """
+        action_discrete = random.choices(population=np.arange(0, 9, 1), weights=action_dist, k=1)[0]
+        #print(action_discrete)
+        used_thunderbolt = False
+        """
+        action_discrete = action
+        action_text = 'move ' + self.raw_state[player]["activemoves"][action_discrete]["name"]
+            #print(action_text)
+        """
         else:
             # switch 2...6
-            action_text = 'switch ' +  str(action_discrete - 2)
+            action_text = 'switch ' +  str(action_discrete - 2)"""
         #print('Chosen action:', chosen_action)
 
         # Return a negative reward for an invalid action
         #valid_action = action_dist[chosen_action] > 0
         #print('Actual Action:', action_text)
-        return action_text
+        valid_action = valid_actions[action_discrete]
+        return action_text, valid_action
 
     # Return a valid random move for the given player
     def get_random_action(self, player):
@@ -236,7 +260,7 @@ class ShowdownEnv(gym.GoalEnv):
                 # Get the status of a pokemon
                 status_obs = np.array(pokemon['status'])
                 # Get the hp of the pokemon
-                hp_obs = np.array(pokemon['hp'])
+                hp_obs = np.array(pokemon['hp']) * 100
                 # Get each pokemon move obs (if its active)
                 moves_obs = np.array([])
                 if pokemon['active']:
@@ -303,7 +327,7 @@ class ShowdownEnv(gym.GoalEnv):
         active_high = np.array([1])
         active_pokembedding_high = np.concatenate((pokembedding_high, active_high), axis=0)
 
-        hp_high = np.array([1])
+        hp_high = np.array([100])
 
         movembedding_high = np.array([2] * 10)
         enabled_move_high = np.array([1])

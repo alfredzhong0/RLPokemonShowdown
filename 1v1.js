@@ -49,8 +49,8 @@ function parseServerOutput(output) {
 
         if (player1) {
         	oldPokemon = player_1["pokemons"]
-	    console.log('Game State:')
-	    console.log(gameState)
+	    //console.log('Game State:')
+	    //console.log(gameState)
 	    if (gameState["active"]) {
             	player_1['trapped'] = gameState["active"][0]["trapped"] == true;
 	    }
@@ -321,6 +321,23 @@ function shuffleList(a) {
     return a;
 }
 
+let rolling_winner = []
+for (let i = 0; i < 100; i++) {
+	rolling_winner[i] = 'Bob';
+}
+
+let game_counter = 0;
+
+function getAliceRollingWinRate() {
+  let awin = 0;
+  for (let i = 0; i < 100; i++) {
+	  if (rolling_winner[i] == 'Alice') {
+		  awin += 1;
+	  }
+  }
+  return awin;
+}
+
 function generateRandomTeam(teamsize) {
 
 	available_pokemon = [
@@ -329,15 +346,15 @@ function generateRandomTeam(teamsize) {
 			"Onix|||none|earthquake,rockslide,slam,selfdestruct||255,255,255,255,255,255||30,30,30,30,30,30||74|",
 			"Alakazam|||none|reflect,splash,psychic,selfdestruct||255,255,255,255,255,255||30,30,30,30,30,30||74|",
 			"Blastoise|||none|hydropump,splash,blizzard,seismictoss||255,255,255,255,255,255||30,30,30,30,30,30||74|",
-			"Charizard|||none|flamethrower,dig,swordsdance,selfdestruct||255,255,255,255,255,255||30,30,30,30,30,30||74|",
-			/*"Gengar|||none|confuseray,hypnosis,psychic,submission||255,255,255,255,255,255||30,30,30,30,30,30||74|",
-			"Hitmonchan|||none|firepunch,icepunch,thunderpunch,megapunch||255,255,255,255,255,255||30,30,30,30,30,30||74|",*/
-			/*"Venusaur|||none|leechseed,razorleaf,bodyslam,rest||255,255,255,255,255,255||30,30,30,30,30,30||74|"*//*,
+			"Charizard|||none|flamethrower,earthquake,swordsdance,selfdestruct||255,255,255,255,255,255||30,30,30,30,30,30||74|",
+			"Gengar|||none|confuseray,hypnosis,psychic,submission||255,255,255,255,255,255||30,30,30,30,30,30||74|",
+			"Hitmonchan|||none|firepunch,icepunch,thunderpunch,megapunch||255,255,255,255,255,255||30,30,30,30,30,30||74|",
+			"Venusaur|||none|leechseed,razorleaf,bodyslam,rest||255,255,255,255,255,255||30,30,30,30,30,30||74|",
 			"Cubone|||none|bodyslam,bonemerang,blizzard,earthquake||255,255,255,255,255,255||30,30,30,30,30,30||74|",
 			"Weezing|||none|splash,sludge,thunder,fireblast||255,255,255,255,255,255||30,30,30,30,30,30||74|",
-			"Scyther|||none|swordsdance,slash,quickattack,skullbash||255,255,255,255,255,255||30,30,30,30,30,30||74|",
+			"Scyther|||none|swordsdance,slash,quickattack,tackle||255,255,255,255,255,255||30,30,30,30,30,30||74|",
 			"Jynx|||none|lovelykiss,psychic,toxic,blizzard||255,255,255,255,255,255||30,30,30,30,30,30||74|",
-			"Exeggutor|||none|stomp,reflect,explosion,takedown||255,255,255,255,255,255||30,30,30,30,30,30||74|",*/
+			"Exeggutor|||none|stomp,reflect,explosion,takedown||255,255,255,255,255,255||30,30,30,30,30,30||74|",
 		];
 
 	available_pokemon = shuffleList(available_pokemon)
@@ -370,15 +387,15 @@ wss.on('connection', function connection(ws) {
 	
             stream.write(`>player p1 {"name":"Alice", "team": "` + generateRandomTeam(teamSize) + `"}`);
             stream.write(`>player p2 {"name":"Bob", "team": "` + generateRandomTeam(teamSize) + `"}`);
-	    /*stream.write(`>player p1 {"name":"Alice", "team": "Raichu|||none|thunderbolt,splash, selfdestruct, explosion||255,255,255,255,255,255||30,30,30,30,30,30||74|"}`);
-            stream.write(`>player p2 {"name":"Bob", "team": "Squirtle|||none|tackle,splash,watergun,scratch||255,255,255,255,255,255||30,30,30,30,30,30||74|"}`);*/
+	    //stream.write(`>player p1 {"name":"Alice", "team": "Raichu|||none|thunderbolt,splash, tackle, teleport||255,255,255,255,255,255||30,30,30,30,30,30||74|"}`);
+            //stream.write(`>player p2 {"name":"Bob", "team": "Squirtle|||none|tackle,splash,watergun,scratch||255,255,255,255,255,255||30,30,30,30,30,30||74|"}`);
 
             (async () => {
                 let output;
                 iter = 0;
                     
                 while ((iter < 3) && (output = await stream.read())) {
-                    console.log("\n<aaa: " + output + " aaa>");
+                    //console.log("\n<aaa: " + output + " aaa>");
                     parseServerOutput(output);
                     iter += 1;
                 }
@@ -386,7 +403,7 @@ wss.on('connection', function connection(ws) {
                 if (iter >= 3) {
                     while (!done) {
                         output = await stream.read();
-                        console.log("\n<bbb: " + output + " bbbß>");
+                        //console.log("\n<bbb: " + output + " bbbß>");
                         parseServerOutput(output); // Update internal state
 
                         // End the battle if a player has won
@@ -403,14 +420,16 @@ wss.on('connection', function connection(ws) {
                             // process.stdin.pause();
 		            wss.clients.forEach(function (client) {
 				 client.send(JSON.stringify({"player1":player_1,"player2":player_2,"winner": winner, 'replay': replay_log}));
-				 console.log('\n\nSending winner\n\n')
+				    rolling_winner[game_counter % 100] = winner;
+				    console.log(`Win Rate: ${getAliceRollingWinRate()}`);
+				    game_counter += 1;
 				 client.close()
 			    })
-		            console.log('Done sending winner');
+		            //console.log('Done sending winner');
                         }
                         // Detect if we need players to choose actions
                         else if (aiRequiresAction(output)) {
-		            console.log('Sending State!!!')
+		            //console.log('Sending State!!!')
 		            wss.clients.forEach(function (client) {
 				 client.send(JSON.stringify({"player1":player_1,"player2":player_2,"winner":"empty"}));
 				 client.terminate()
