@@ -50,6 +50,7 @@ class ShowdownEnv(gym.GoalEnv):
         # The opponent's model
         self.has_opp_model = opp_model
         self.new_opp_model_every_x_episodes = new_opp_model_every_x_episodes
+        self.game_counter = 0
 
     def set_model(self, model, opponent_model=None):
         self.agent_model = model
@@ -117,7 +118,22 @@ class ShowdownEnv(gym.GoalEnv):
         opp_action = self.get_random_action('player2')"""
         # Send the action to the simulator and get the new observation
         if agent_valid_action:
+
             self.raw_state = json.loads(send_agent_input(agent_action, opp_action))
+
+            #print(self.raw_state)
+            active_moves = self.raw_state["player1"]["activemoves"]
+            for i in range(len(active_moves)):
+                move = active_moves[i]
+                if (move["name"] == "SPECIAL_FORCE_SWITCH"):
+                    print("punish for SPECIAL_FORCE_SWITCH")
+                    reward = -1
+                    break
+                elif (move["name"] == "SPECIAL_FORCE_WAIT"):
+                    print("reward for SPECIAL_FORCE_WAIT")
+                    reward = 1
+                    break
+
             self.agent_obs, self.opponent_obs = self.vectorize_obs(self.raw_state)
         #print(self.agent_obs)
         # Assign a positive reward for a win and a negative reward for a loss
@@ -127,7 +143,7 @@ class ShowdownEnv(gym.GoalEnv):
                 #print('Game is complete!')
                 done = True
                 agent_win = 'Alice' in self.raw_state['winner']
-                reward = 1 if agent_win else -1
+                reward = 3 if agent_win else -3
                 # Update opponent win/loss count
                 #print('Opponent {} '.format(self.opp_idx) + 'lost!' if agent_win else 'won!')
                 self.opp_wins[self.opp_idx] += 0 if agent_win else 1
@@ -168,6 +184,10 @@ class ShowdownEnv(gym.GoalEnv):
                 print('Invalid Action')
             self.steps += 1
         #print('Reward:', reward)
+
+        if (done):
+            self.game_counter += 1
+            print("Have simulated %d games  reward=%d" % (self.game_counter,reward))
 
         obs = self.agent_obs
         return obs, reward, done, info     
