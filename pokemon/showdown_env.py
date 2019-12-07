@@ -144,7 +144,7 @@ class ShowdownEnv(gym.GoalEnv):
                 # Update the episode count - used to determine if a new model should be added
                 self.episode_count += 1
 
-                if self.update_model:
+                if self.update_model and not self.opponent_random_policy:
                     if self.episode_count % self.new_opp_model_every_x_episodes == 0:
                         new_opp_model = PPO2(MlpPolicy, self.dummy_env)
                         new_opp_model.load_parameters(self.agent_model.get_parameters())
