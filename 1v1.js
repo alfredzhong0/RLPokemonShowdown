@@ -342,19 +342,27 @@ function generateRandomTeam(teamsize) {
 
 	available_pokemon = [
 		
-			"Raichu|||none|quickattack,thunderbolt,thunderwave,splash||255,255,255,255,255,255||30,30,30,30,30,30||74|",
-			"Onix|||none|earthquake,rockslide,slam,selfdestruct||255,255,255,255,255,255||30,30,30,30,30,30||74|",
-			"Alakazam|||none|reflect,splash,psychic,selfdestruct||255,255,255,255,255,255||30,30,30,30,30,30||74|",
-			"Blastoise|||none|hydropump,splash,blizzard,seismictoss||255,255,255,255,255,255||30,30,30,30,30,30||74|",
-			"Charizard|||none|flamethrower,earthquake,swordsdance,selfdestruct||255,255,255,255,255,255||30,30,30,30,30,30||74|",
-			"Gengar|||none|confuseray,hypnosis,psychic,submission||255,255,255,255,255,255||30,30,30,30,30,30||74|",
-			"Hitmonchan|||none|firepunch,icepunch,thunderpunch,megapunch||255,255,255,255,255,255||30,30,30,30,30,30||74|",
+			"Raichu|||none|quickattack,thunderbolt,thunderwave,agility||255,255,255,255,255,255||30,30,30,30,30,30||74|",
+			"Onix|||none|earthquake,rockslide,harden,rest||255,255,255,255,255,255||30,30,30,30,30,30||74|",
+			"Alakazam|||none|reflect,recover,psychic,selfdestruct||255,255,255,255,255,255||30,30,30,30,30,30||74|",
+			"Blastoise|||none|hydropump,tailwhip,blizzard,seismictoss||255,255,255,255,255,255||30,30,30,30,30,30||74|",
+			"Charizard|||none|flamethrower,earthquake,swordsdance,firespin||255,255,255,255,255,255||30,30,30,30,30,30||74|",
+			"Gengar|||none|confuseray,lick,psychic,submission||255,255,255,255,255,255||30,30,30,30,30,30||74|",
+			"Hitmonchan|||none|rest,icepunch,thunderpunch,megapunch||255,255,255,255,255,255||30,30,30,30,30,30||74|",
 			"Venusaur|||none|leechseed,razorleaf,bodyslam,rest||255,255,255,255,255,255||30,30,30,30,30,30||74|",
-			"Cubone|||none|bodyslam,bonemerang,blizzard,earthquake||255,255,255,255,255,255||30,30,30,30,30,30||74|",
+			"Cubone|||none|thrash,bonemerang,blizzard,earthquake||255,255,255,255,255,255||30,30,30,30,30,30||74|",
 			"Weezing|||none|splash,sludge,thunder,fireblast||255,255,255,255,255,255||30,30,30,30,30,30||74|",
-			"Scyther|||none|swordsdance,slash,quickattack,tackle||255,255,255,255,255,255||30,30,30,30,30,30||74|",
+			"Scyther|||none|swordsdance,slash,quickattack,swift||255,255,255,255,255,255||30,30,30,30,30,30||74|",
 			"Jynx|||none|lovelykiss,psychic,toxic,blizzard||255,255,255,255,255,255||30,30,30,30,30,30||74|",
-			"Exeggutor|||none|stomp,reflect,explosion,takedown||255,255,255,255,255,255||30,30,30,30,30,30||74|",
+			"Exeggutor|||none|megadrain,reflect,stomp,psychic||255,255,255,255,255,255||30,30,30,30,30,30||74|",
+
+            "Raticate|||none|hyperfang,quickattack,bodyslam,doubleedge||255,255,255,255,255,255||30,30,30,30,30,30||74|",
+            "Fearow|||none|drillpeck,mirrormove,doubleedge,skyattack||255,255,255,255,255,255||30,30,30,30,30,30||74|",
+            "Golem|||none|harden,earthquake,explosion,rockthrow||255,255,255,255,255,255||30,30,30,30,30,30||74|",
+            "Gyarados|||none|bite,skullbash,toxic,hydropump||255,255,255,255,255,255||30,30,30,30,30,30||74|",
+            "Dragonite|||none|dragonrage,hyperbeam,thunder,icebeam||255,255,255,255,255,255||30,30,30,30,30,30||74|",
+            "Arcanine|||none|flamethrower,bodyslam,leer,takedown||255,255,255,255,255,255||30,30,30,30,30,30||74|",
+            "Victreebel|||none|solarbeam,reflect,razorleaf,slam||255,255,255,255,255,255||30,30,30,30,30,30||74|",
 		];
 
 	available_pokemon = shuffleList(available_pokemon)
