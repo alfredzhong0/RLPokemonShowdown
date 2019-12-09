@@ -17,14 +17,16 @@ from .load_embeddings import load_embeddings
 class ShowdownEnv(gym.GoalEnv):
     
     def __init__(self, model=None, log_dir='./replay_logs', HER=False, num_pokemon=1, new_opp_model_every_x_episodes=1000, opp_model=True, update_model=True, opponent_random_policy=False):
-        """{"player1":{"buffs":{"atk":0,"def":0,"spe":0,"spa":0,"spd":0,"evasion":0,"accuracy":0},"effects":[0,0,0,0],
-        "pokemons":[{"name":"Mewtwo","hp":1,"active":true,"status":[0,0,0,0,0,0]},{"name":"Snorlax","hp":1,"active":false,"status":[0,0,0,0,0,0]}],"activemoves":[{"name":"splash","enabled":true},{"name":"leechseed","enabled":true},{"name":"haze","enabled":true}]},"player2":{"buffs":{"atk":0,"def":0,"spe":0,"spa":0,"spd":0,"evasion":0,"accuracy":0},"effects":[0,0,0,0],"pokemons":[{"name":"Mew","hp":1,"active":true,"status":[0,0,0,0,0,0]},{"name":"Snorlax","hp":1,"active":false,"status":[0,0,0,0,0,0]}],"activemoves":[{"name":"splash","enabled":true},{"name":"leechseed","enabled":true}, {"name":"haze","enabled":true}]},"winner":"empty"}""" 
-        # Input dimensions and their high and low values 
 
-        self.update_model = update_model
-        self.opponent_random_policy = opponent_random_policy
-        self.num_pokemon = num_pokemon
-        obs_low, obs_high = self.high_low() 
+        self.rolling_winner = ['Bob'] * 1000
+        self.game_counter = 0 # Tracks how many games the model has played
+        self.update_model = update_model # True if training with self-play
+        self.opponent_random_policy = opponent_random_policy # True if testing against random policy
+        self.num_pokemon = num_pokemon # 1v1 ... 6v6
+
+        # Input dimensions and their high and low values 
+        obs_low, obs_high = self.high_low()
+
         # State space for regular algorithms
         if not HER: 
             self.observation_space = spaces.Box(obs_low, obs_high) 
@@ -38,19 +40,23 @@ class ShowdownEnv(gym.GoalEnv):
         self.replay_text = None
         self.steps = 0
         self.episode_count = 1
+
         # Action space
         self.action_space = spaces.Discrete(9) 
         self.log_dir = log_dir
+
         # Load the move embeddings and the pokemon embeddings
         self.move_dict, self.poke_dict = load_embeddings()
         self.log_dir = log_dir
+
         # The agent's model
         print(model)
         self.agent_model = model
+
         # The opponent's model
         self.has_opp_model = opp_model
         self.new_opp_model_every_x_episodes = new_opp_model_every_x_episodes
-        self.game_counter = 0
+        
 
     def set_model(self, model, opponent_model=None):
         self.agent_model = model
@@ -60,12 +66,9 @@ class ShowdownEnv(gym.GoalEnv):
             self.dummy_env = DummyVecEnv([lambda: env])
             print(self.dummy_env.action_space)
             
-            opp_model = PPO2(MlpPolicy, self.dummy_env)
-
+            opp_model = PPO2(MlpPolicy, self.dummy_env) # Random policy
             if (opponent_model):
                 opp_model.load_parameters(opponent_model.get_parameters())
-            # else:
-            #     opp_model.load_parameters(self.agent_model.get_parameters())
 
             # Set the loss/win ratio to 1 so the opponent has a chance of picking the new model
             self.opp_losses = np.array([1])
@@ -73,7 +76,6 @@ class ShowdownEnv(gym.GoalEnv):
             self.opp_models = [opp_model]
 
     
-
     
     def add_opp_model(self, model):
         self.opp_models.append(model)
@@ -87,19 +89,18 @@ class ShowdownEnv(gym.GoalEnv):
         return opp_idx
 
     def step(self, action):
+
         info = {} 
-        # Set the reward to -0.1 by default so the agent finishes battles as quickly as possible
-        # reward = -1
-        # Alternatively, set the reward to 0. This may reduce reward variance.
-        #reward = -1
         done = False
         reward = 0
+
         # Pick the opponent's model
         if self.steps == 0:
             self.opp_idx = self.get_opponent_model()
             self.opp_model = self.opp_models[self.opp_idx]
             #print("self.opp_models.length = " + str(len(self.opp_models)))
             #print('Playing opponent', self.opp_idx)
+
         # Get the action text to send to the simulator
         # Get the agent's action
         agent_action, agent_valid_action = self.get_action(action, 'player1')
@@ -107,21 +108,21 @@ class ShowdownEnv(gym.GoalEnv):
         opp_valid_action = False
         if agent_valid_action:
             while not opp_valid_action:
-                if (self.opponent_random_policy): 
+                if (self.opponent_random_policy): # If random policy, don't use opponent model to predict
                     opp_action = self.get_random_action("player2")
                     opp_valid_action = True
                 else:
                     opp_action_discrete, _ = self.opp_model.predict(self.opponent_obs)
+                    #print("opp_action_discrete = " + str(opp_action_discrete))
                     opp_action, opp_valid_action = self.get_action(opp_action_discrete, 'player2')
-        """
-        # Have the opponent be a random agent for now
-        opp_action = self.get_random_action('player2')"""
+                    #print("ALFRED %s, %s" % (opp_action, opp_valid_action))
+                    #print(self.opp_model.action_probability(self.opponent_obs))
+
         # Send the action to the simulator and get the new observation
         if agent_valid_action:
 
+            #print("ALFRED Agent action = %s; Opp Action = %s" % (agent_action, opp_action))
             self.raw_state = json.loads(send_agent_input(agent_action, opp_action))
-
-            #print(self.raw_state)
             active_moves = self.raw_state["player1"]["activemoves"]
             for i in range(len(active_moves)):
                 move = active_moves[i]
@@ -143,7 +144,13 @@ class ShowdownEnv(gym.GoalEnv):
                 #print('Game is complete!')
                 done = True
                 agent_win = 'Alice' in self.raw_state['winner']
-                reward = 3 if agent_win else -3
+                if agent_win:
+                    reward = 3
+                    self.rolling_winner[self.game_counter%1000] = 'Alice'
+                else:
+                    reward = -3
+                    self.rolling_winner[self.game_counter%1000] = 'Bob'
+
                 # Update opponent win/loss count
                 #print('Opponent {} '.format(self.opp_idx) + 'lost!' if agent_win else 'won!')
                 self.opp_wins[self.opp_idx] += 0 if agent_win else 1
@@ -187,9 +194,12 @@ class ShowdownEnv(gym.GoalEnv):
 
         if (done):
             self.game_counter += 1
+            if (self.game_counter % 1000 == 0):
+                self.write_winrate_log()
             print("Have simulated %d games  reward=%d" % (self.game_counter,reward))
 
         obs = self.agent_obs
+        #print("ALFRED finish step")
         return obs, reward, done, info     
 
     # Set the initial state and begin a new game
@@ -203,6 +213,9 @@ class ShowdownEnv(gym.GoalEnv):
     def get_action(self, action, player): 
         # Provide a negative reward if the chosen action is invalid
         #chosen_action = np.argmax(action_dist)
+
+        #print("%s  m_id = %d" % (player,self.raw_state["message_id"]))
+        #print(self.raw_state[player])
 
         force_switch = False
         move_name = self.raw_state[player]["activemoves"][0]["name"]
@@ -245,14 +258,26 @@ class ShowdownEnv(gym.GoalEnv):
         if not valid_actions[action]:
             return '', False
         # Invalidate switches to nonexistent pokemon
-        for i in range(2, 7):
-            if i > alive_pokemon and not (force_switch and i == alive_pokemon + 1):
-                #print('Disabling nonexistent switch')
-                valid_actions[i - 2 + 4] = 0
+        # for i in range(2, 7):
+        #     if i > alive_pokemon and not (force_switch and i == alive_pokemon + 1):
+        #         #print('Disabling nonexistent switch')
+        #         valid_actions[i - 2 + 4] = False
+        # print(self.raw_state[player])
+
+        for i in range(len(self.raw_state[player]["pokemons"])):
+            if (i == 0):
+                continue # Can never switch into current Pokemon (aka. switch 1)
+            cur_pokemon = self.raw_state[player]["pokemons"][i]
+            if (cur_pokemon["hp"] == 0):
+                valid_actions[i + 3] = False # Invalidates switches to fainted Pokemon
+
+        # Invalidates switches to unavailable Pokemon (for less than 6v6 case)
+        for i in range(8, 2+len(self.raw_state[player]["pokemons"]), -1):
+            valid_actions[i] = False
         
         if not valid_actions[action]:
             return '', False
-        
+
         # Select an action
         action_discrete = action
 
@@ -297,6 +322,20 @@ class ShowdownEnv(gym.GoalEnv):
         
         return p1move
 
+    def rolling_winrate(self):
+        wins = 0
+        for i in range(1000):
+            if self.rolling_winner[i] == 'Alice':
+                wins += 1
+        return wins
+
+    # Output winrate to file (so we can graph it for the paper)
+    def write_winrate_log(self):
+        winrate_log = open(self.log_dir + '/winrate.log', "a")
+        text = str(self.game_counter) + "," + str(self.rolling_winrate()) + "\n"
+        winrate_log.write(text)
+        winrate_log.close()
+
     # Write a replay log to a file
     def write_replay_log(self):
         # Create the "replays" directory if it doesn't exist
@@ -306,8 +345,8 @@ class ShowdownEnv(gym.GoalEnv):
         replay_text = self.replay_text
 
         if replay_text is not None:
-            time_str = time.strftime('%Y%m%d-%H%M%S')
-            file_name = self.log_dir + '/replays/' + time_str + '.log'
+            #time_str = time.strftime('%Y%m%d-%H%M%S')
+            file_name = self.log_dir + '/replays/' + str(self.game_counter) + '.log'
             with open(file_name, 'w') as log_file:
                 log_file.write(replay_text)
 

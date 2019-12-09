@@ -13,8 +13,8 @@ html,body {font-family:Verdana, sans-serif;font-size:10pt;margin:0;padding:0;}bo
 update
 |player|p1|Alice||update
 |player|p2|Bob||
-|teamsize|p1|1
-|teamsize|p2|1
+|teamsize|p1|2
+|teamsize|p2|2
 |gametype|singles
 |gen|1
 |tier|[Gen 1] OU
@@ -27,113 +27,121 @@ update
 |
 |start
 |split|p1
-|switch|p1a: Venusaur|Venusaur, L74|271/271
-|switch|p1a: Venusaur|Venusaur, L74|100/100
+|switch|p1a: Onix|Onix, L74|204/204
+|switch|p1a: Onix|Onix, L74|100/100
 |split|p2
-|switch|p2a: Scyther|Scyther, L74|256/256
-|switch|p2a: Scyther|Scyther, L74|100/100
+|switch|p2a: Fearow|Fearow, L74|249/249
+|switch|p2a: Fearow|Fearow, L74|100/100
 |turn|1update
 |
-|move|p2a: Scyther|Slash|p1a: Venusaur
-|-crit|p1a: Venusaur
+|move|p2a: Fearow|Double-Edge|p1a: Onix
+|-crit|p1a: Onix
+|-resisted|p1a: Onix
 |split|p1
-|-damage|p1a: Venusaur|170/271
-|-damage|p1a: Venusaur|63/100
-|move|p1a: Venusaur|Body Slam|p2a: Scyther
-|-crit|p2a: Scyther
+|-damage|p1a: Onix|151/204
+|-damage|p1a: Onix|75/100
 |split|p2
-|-damage|p2a: Scyther|160/256
-|-damage|p2a: Scyther|63/100
+|-damage|p2a: Fearow|236/249|[from] Recoil|[of] p1a: Onix
+|-damage|p2a: Fearow|95/100|[from] Recoil|[of] p1a: Onix
+|move|p1a: Onix|Rock Slide|p2a: Fearow
+|-supereffective|p2a: Fearow
+|split|p2
+|-damage|p2a: Fearow|119/249
+|-damage|p2a: Fearow|48/100
 |
 |upkeep
 |turn|2update
 |
-|move|p2a: Scyther|Slash|p1a: Venusaur
-|-crit|p1a: Venusaur
-|split|p1
-|-damage|p1a: Venusaur|79/271
-|-damage|p1a: Venusaur|30/100
-|move|p1a: Venusaur|Body Slam|p2a: Scyther
+|move|p2a: Fearow|Sky Attack||[still]
+|-prepare|p2a: Fearow|Sky Attack|p1a: Onix
+|move|p1a: Onix|Rock Slide|p2a: Fearow
+|-supereffective|p2a: Fearow
 |split|p2
-|-damage|p2a: Scyther|110/256
-|-damage|p2a: Scyther|43/100
-|-status|p2a: Scyther|par
+|-damage|p2a: Fearow|14/249
+|-damage|p2a: Fearow|6/100
 |
 |upkeep
 |turn|3update
 |
-|move|p1a: Venusaur|Rest|p1a: Venusaur
-|-status|p1a: Venusaur|slp|[from] move: Rest
+|move|p2a: Fearow|Sky Attack|p1a: Onix|[from]Sky Attack
+|-resisted|p1a: Onix
 |split|p1
-|-heal|p1a: Venusaur|271/271 slp|[silent]
-|-heal|p1a: Venusaur|100/100 slp|[silent]
-|cant|p2a: Scyther|par
+|-damage|p1a: Onix|110/204
+|-damage|p1a: Onix|54/100
+|move|p1a: Onix|Earthquake|p2a: Fearow
+|-immune|p2a: Fearow
 |
 |upkeep
 |turn|4update
 |
-|cant|p1a: Venusaur|slp
-|move|p2a: Scyther|Slash|p1a: Venusaur
-|-crit|p1a: Venusaur
+|move|p2a: Fearow|Double-Edge|p1a: Onix
+|-crit|p1a: Onix
+|-resisted|p1a: Onix
 |split|p1
-|-damage|p1a: Venusaur|170/271 slp
-|-damage|p1a: Venusaur|63/100 slp
+|-damage|p1a: Onix|53/204
+|-damage|p1a: Onix|26/100
+|split|p2
+|-damage|p2a: Fearow|0 fnt|[from] Recoil|[of] p1a: Onix
+|-damage|p2a: Fearow|0 fnt|[from] Recoil|[of] p1a: Onix
+|faint|p2a: Fearowsideupdate
+p1
+|error|[Invalid choice] Can't do anything: It's not your turnupdate
 |
-|upkeep
+|split|p2
+|switch|p2a: Hitmonchan|Hitmonchan, L74|226/226
+|switch|p2a: Hitmonchan|Hitmonchan, L74|100/100
 |turn|5update
 |
-|-curestatus|p1a: Venusaur|slp|[msg]
-|move|p2a: Scyther|Slash|p1a: Venusaur
-|-crit|p1a: Venusaur
-|split|p1
-|-damage|p1a: Venusaur|68/271
-|-damage|p1a: Venusaur|26/100
+|move|p2a: Hitmonchan|Rest|p2a: Hitmonchan
+|-fail|p2a: Hitmonchan
+|move|p1a: Onix|Rock Slide|p2a: Hitmonchan
+|-resisted|p2a: Hitmonchan
+|split|p2
+|-damage|p2a: Hitmonchan|201/226
+|-damage|p2a: Hitmonchan|89/100
 |
 |upkeep
 |turn|6update
 |
-|move|p1a: Venusaur|Rest|p1a: Venusaur
-|-status|p1a: Venusaur|slp|[from] move: Rest
 |split|p1
-|-heal|p1a: Venusaur|271/271 slp|[silent]
-|-heal|p1a: Venusaur|100/100 slp|[silent]
-|cant|p2a: Scyther|par
+|switch|p1a: Victreebel|Victreebel, L74|271/271
+|switch|p1a: Victreebel|Victreebel, L74|100/100
+|move|p2a: Hitmonchan|Mega Punch|p1a: Victreebel
+|split|p1
+|-damage|p1a: Victreebel|206/271
+|-damage|p1a: Victreebel|77/100
 |
 |upkeep
 |turn|7update
 |
-|cant|p1a: Venusaur|slp
-|cant|p2a: Scyther|par
+|move|p2a: Hitmonchan|Mega Punch|p1a: Victreebel
+|-crit|p1a: Victreebel
+|split|p1
+|-damage|p1a: Victreebel|90/271
+|-damage|p1a: Victreebel|34/100
+|move|p1a: Victreebel|Razor Leaf|p2a: Hitmonchan
+|-crit|p2a: Hitmonchan
+|split|p2
+|-damage|p2a: Hitmonchan|22/226
+|-damage|p2a: Hitmonchan|10/100
 |
 |upkeep
 |turn|8update
 |
-|-curestatus|p1a: Venusaur|slp|[msg]
-|cant|p2a: Scyther|par
-|
-|upkeep
-|turn|9update
-|
-|move|p1a: Venusaur|Body Slam|p2a: Scyther
-|-crit|p2a: Scyther
+|move|p2a: Hitmonchan|Thunder Punch|p1a: Victreebel
+|-crit|p1a: Victreebel
+|-resisted|p1a: Victreebel
+|split|p1
+|-damage|p1a: Victreebel|67/271
+|-damage|p1a: Victreebel|25/100
+|move|p1a: Victreebel|Razor Leaf|p2a: Hitmonchan
+|-crit|p2a: Hitmonchan
 |split|p2
-|-damage|p2a: Scyther|16/256 par
-|-damage|p2a: Scyther|7/100 par
-|cant|p2a: Scyther|par
-|
-|upkeep
-|turn|10update
-|
-|move|p1a: Venusaur|Razor Leaf|p2a: Scyther
-|-crit|p2a: Scyther
-|-resisted|p2a: Scyther
-|split|p2
-|-damage|p2a: Scyther|0 fnt
-|-damage|p2a: Scyther|0 fnt
-|faint|p2a: Scyther
+|-damage|p2a: Hitmonchan|0 fnt
+|-damage|p2a: Hitmonchan|0 fnt
+|faint|p2a: Hitmonchan
 |
 |win|Alice
-
 
 
 </script>

@@ -11,6 +11,8 @@ const wss = new WebSocket.Server({ port: 39999 });
 player_1 = {"buffs":{"atk":0,"def":0,"spe":0,"spa":0,"spd":0,"evasion":0,"accuracy":0}, "effects":[0,0,0,0], "last_move": "", "trapped": false};
 player_2 = {"buffs":{"atk":0,"def":0,"spe":0,"spa":0,"spd":0,"evasion":0,"accuracy":0}, "effects":[0,0,0,0], "last_move": "", "trapped": false};
 replay_log = ""
+p1_move = "none"
+p2_move = "none"
 
 function aiRequiresAction(output) {
     msgLines = output.split('\n');
@@ -30,10 +32,40 @@ function aiRequiresAction(output) {
     }
     return false;
 }
+
+// Weird edge case where if player switches into Pokemon, and it instantly dies from opponents move,
+// Then server sends two states, causing the game state to be inconsistent in the client
+// Should only allow the second state to be sent
+youShallPass = false
+function satisfiesEdgeCase() {
+
+    if (!youShallPass) {
+        youShallPass = true
+        if (p1_move.includes("switch")) { // Player 1's previous move is a switch
+            if (player_1["pokemons"][0]["hp"] == 0) {
+                console.log(player_1)
+                console.log("You shall not pass")
+                return false
+            }
+        }
+        if (p2_move.includes("switch")) { // Player 2's previous move is a switch
+            if (player_2["pokemons"][0]["hp"] == 0) {
+                console.log(player_2)
+                console.log("You shall not pass")
+                return false
+            }
+        }
+
+    }
+    youShallPass = false
+    return true
+}
+
 function containsWinStr(output) {
     const WIN_STRING = '|win|';
     return output.includes(WIN_STRING);
 }
+
 function parseServerOutput(output) {
 
     if (!output.includes("|request|")) { // Add everythin else to replay log
@@ -341,7 +373,6 @@ function getAliceRollingWinRate() {
 function generateRandomTeam(teamsize) {
 
 	available_pokemon = [
-		
 			"Raichu|||none|quickattack,thunderbolt,thunderwave,agility||255,255,255,255,255,255||30,30,30,30,30,30||74|",
 			"Onix|||none|earthquake,rockslide,harden,rest||255,255,255,255,255,255||30,30,30,30,30,30||74|",
 			"Alakazam|||none|reflect,recover,psychic,selfdestruct||255,255,255,255,255,255||30,30,30,30,30,30||74|",
@@ -355,7 +386,6 @@ function generateRandomTeam(teamsize) {
 			"Scyther|||none|swordsdance,slash,quickattack,swift||255,255,255,255,255,255||30,30,30,30,30,30||74|",
 			"Jynx|||none|lovelykiss,psychic,toxic,blizzard||255,255,255,255,255,255||30,30,30,30,30,30||74|",
 			"Exeggutor|||none|megadrain,reflect,stomp,psychic||255,255,255,255,255,255||30,30,30,30,30,30||74|",
-
             "Raticate|||none|hyperfang,quickattack,bodyslam,doubleedge||255,255,255,255,255,255||30,30,30,30,30,30||74|",
             "Fearow|||none|drillpeck,mirrormove,doubleedge,skyattack||255,255,255,255,255,255||30,30,30,30,30,30||74|",
             "Golem|||none|harden,earthquake,explosion,rockthrow||255,255,255,255,255,255||30,30,30,30,30,30||74|",
@@ -377,6 +407,7 @@ function generateRandomTeam(teamsize) {
 
 
 
+message_id = 0
 wss.on('connection', function connection(ws) {
 
 
@@ -395,7 +426,7 @@ wss.on('connection', function connection(ws) {
 	
             stream.write(`>player p1 {"name":"Alice", "team": "` + generateRandomTeam(teamSize) + `"}`);
             stream.write(`>player p2 {"name":"Bob", "team": "` + generateRandomTeam(teamSize) + `"}`);
-	    //stream.write(`>player p1 {"name":"Alice", "team": "Raichu|||none|thunderbolt,splash, tackle, teleport||255,255,255,255,255,255||30,30,30,30,30,30||74|"}`);
+	        //stream.write(`>player p1 {"name":"Alice", "team": "Raichu|||none|thunderbolt,splash, tackle, teleport||255,255,255,255,255,255||30,30,30,30,30,30||74|"}`);
             //stream.write(`>player p2 {"name":"Bob", "team": "Squirtle|||none|tackle,splash,watergun,scratch||255,255,255,255,255,255||30,30,30,30,30,30||74|"}`);
 
             (async () => {
@@ -411,13 +442,13 @@ wss.on('connection', function connection(ws) {
                 if (iter >= 3) {
                     while (!done) {
                         output = await stream.read();
-                        //console.log("\n<bbb: " + output + " bbbß>");
+                        //console.log(output)
+                        //console.log("\n<bbb: " + output + " bbb>");
                         parseServerOutput(output); // Update internal state
 
                         // End the battle if a player has won
                         if (containsWinStr(output)){
                             done = true;
-
                             parts = output.split("\n")
                             for (var i = 0; i < parts.length; i++) {
                                 line = parts[i]
@@ -426,22 +457,27 @@ wss.on('connection', function connection(ws) {
                                 }
                             }
                             // process.stdin.pause();
-		            wss.clients.forEach(function (client) {
-				 client.send(JSON.stringify({"player1":player_1,"player2":player_2,"winner": winner, 'replay': replay_log}));
-				    rolling_winner[game_counter % 100] = winner;
-				    console.log(`Win Rate: ${getAliceRollingWinRate()}`);
-				    game_counter += 1;
-				 client.close()
-			    })
-		            //console.log('Done sending winner');
+        		            wss.clients.forEach(function (client) {
+            				 client.send(JSON.stringify({"player1":player_1,"player2":player_2,"winner": winner, 'replay': replay_log}));
+            				    rolling_winner[game_counter % 100] = winner;
+            				    console.log(`Win Rate: ${getAliceRollingWinRate()}`);
+            				    game_counter += 1;
+            				 client.close()
+            			    })
+		                    //console.log('Done sending winner');
                         }
                         // Detect if we need players to choose actions
                         else if (aiRequiresAction(output)) {
-		            //console.log('Sending State!!!')
-		            wss.clients.forEach(function (client) {
-				 client.send(JSON.stringify({"player1":player_1,"player2":player_2,"winner":"empty"}));
-				 client.terminate()
-			    })
+        		            //console.log('Sending State!!!')
+                            if (true){//satisfiesEdgeCase()) {
+            		            wss.clients.forEach(function (client) {
+                                 msg = JSON.stringify({"player1":player_1,"player2":player_2,"winner":"empty","message_id":message_id})
+                				 client.send(msg);
+                				 //console.log(msg)
+                                 message_id += 1
+                                 client.terminate()
+                			    })
+                            }
                         }
                         
                     }

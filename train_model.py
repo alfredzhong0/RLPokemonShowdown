@@ -16,7 +16,7 @@ from stable_baselines import ACER
 import pokemon
 
 
-best_mean_reward, n_steps = -np.inf, 0
+best_mean_reward, n_steps, last_saved_game = -np.inf, 0, 0
 
 def callback(_locals, _globals):
 
@@ -25,12 +25,14 @@ def callback(_locals, _globals):
     :param _locals: (dict)
     :param _globals: (dict)
     """
-    global n_steps, best_mean_reward, base_env
-    #print('Best Mean Reward:', best_mean_reward)
-    # Print stats every 1000 calls
-    #print(n_steps)
-    #n_steps += 1
-    if  n_steps >= 100 and n_steps % 100 == 0:
+    global best_mean_reward, base_env, last_saved_game
+
+    cur_game = base_env.game_counter
+
+    if cur_game - last_saved_game > 100:
+
+        last_saved_game = cur_game
+
         # Evaluate policy training performance 
         x, y = ts2xy(load_results(log_dir), 'timesteps') 
         if len(x) > 0:
@@ -41,16 +43,21 @@ def callback(_locals, _globals):
             print('Writing replay log...')
             base_env.write_replay_log()
 
+            # Save model
+            if (n_steps % 10000 == 0):
+                print('Saving model ' + str(cur_game))
+                #time_str = time.strftime('%Y%m%d-%H%M%S')
+                # Model name is how many games the agent has trained on
+                _locals['self'].save(log_dir + '/game' + str(cur_game) + '.pkl')
+
             # New best model, you could save the agent here
             if mean_reward > best_mean_reward:
                 best_mean_reward = mean_reward
                 # Example for saving best model
                 print("Saving new best model")
                 _locals['self'].save(log_dir + '/best_model.pkl')
-            if n_steps % 10000 == 0:
-                print('Saving model')
-                time_str = time.strftime('%Y%m%d-%H%M%S')
-                _locals['self'].save(log_dir + '/' + time_str + '.pkl')
+
+
     return True
 
 epochs = 1
@@ -58,18 +65,18 @@ log_time_str = None
 
 for i in range(epochs):
     # Create log dir with timestamp
-    log_dir = "./log_showdown/2v2_random_policy/"
+    log_dir = "./log_showdown/1v1_self_play/"
     time_str = time.strftime('%Y%m%d-%H%M%S')
     log_dir += time_str
     os.makedirs(log_dir, exist_ok=True)
 
     # Create and wrap the environment
-    base_env = gym.make('Pokemon-v0', log_dir=log_dir, HER=False, num_pokemon=2, update_model=False, opponent_random_policy=True)
+    base_env = gym.make('Pokemon-v0', log_dir=log_dir, HER=False, num_pokemon=1, update_model=True, new_opp_model_every_x_episodes=10000, opponent_random_policy=False)
     env = Monitor(base_env, log_dir, allow_early_resets=True)
     env = DummyVecEnv([lambda: env])
     model = PPO2(MlpPolicy, env, verbose=0)
     base_env.set_model(model)
-    n_steps = 500000
-    model.learn(n_steps, callback=callback)
+    training_steps = 1000000
+    model.learn(training_steps, callback=callback)
     #results_plotter.plot_results([log_dir], 15000, results_plotter.X_TIMESTEPS, "Showdown")
     #plt.show()
