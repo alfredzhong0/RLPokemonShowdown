@@ -14,7 +14,7 @@ import pokemon
 
 # Create environment
 # Create log dir with timestamp
-log_dir = "./log_showdown/1v1_RANDvsSP_SHOWDOWN/"
+log_dir = "./log_showdown/deleteMe/"#1v1_RANDvsSP_SHOWDOWN/"
 time_str = time.strftime('%Y%m%d-%H%M%S')
 log_dir += time_str
 os.makedirs(log_dir, exist_ok=True)
