@@ -71,8 +71,8 @@ for i in range(epochs):
     os.makedirs(log_dir, exist_ok=True)
 
     # Create and wrap the environment
-    # base_env = gym.make('Pokemon-v0', log_dir=log_dir, HER=False, num_pokemon=1, update_model=True, new_opp_model_every_x_episodes=10000, opponent_random_policy=False)
-    base_env = gym.make('Pokemon-v0', log_dir=log_dir, HER=False, num_pokemon=1, update_model=False, opponent_random_policy=True)
+    base_env = gym.make('Pokemon-v0', log_dir=log_dir, HER=False, num_pokemon=3, update_model=True, new_opp_model_every_x_episodes=10000, opponent_random_policy=False)
+    # base_env = gym.make('Pokemon-v0', log_dir=log_dir, HER=False, num_pokemon=3, update_model=False, opponent_random_policy=True)
     env = Monitor(base_env, log_dir, allow_early_resets=True)
     env = DummyVecEnv([lambda: env])
     model = PPO2(MlpPolicy, env, verbose=0)

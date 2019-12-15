@@ -473,7 +473,7 @@ wss.on('connection', function connection(ws) {
             		            wss.clients.forEach(function (client) {
                                  msg = JSON.stringify({"player1":player_1,"player2":player_2,"winner":"empty","message_id":message_id})
                 				 client.send(msg);
-                				 //console.log(msg)
+                				 console.log(msg)
                                  message_id += 1
                                  client.terminate()
                 			    })
